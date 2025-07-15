@@ -1,0 +1,318 @@
+<html>
+    <link href="../assets/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<link href="../assets/css/mystyle.css" rel="stylesheet">
+    <link href="../assets/css/snakes-and-ladders.css" rel="stylesheet">
+    <title>SNAKES AND LADDERS</title>
+	<style>
+        
+	</style>
+	<body>
+        <div class="container-fluid">	
+            <div id="game_portal" class="row align-center h-100 d-none">
+                <div class="menu col-6 text-center">
+                    <span>
+                        <button id="btn_create" class="btn btn-primary" onclick="create_room()">CREATE</button>
+                    </span>
+                </div>
+                <div class="menu col-6 text-center">
+                    ROOM ID:
+                    <br/>
+                    <input id="room_id" class="inp">
+                    <br/><br/>
+                    <button id="btn_join" class="btn btn-primary" onclick="join_room()">JOIN</button>
+                </div>
+            </div>
+
+            <div id="game" class="d-none">
+                <div class="row bg-primary">
+                    <div class="p-2 d-flex justify-content-between">
+                        <div class="col text-white fs-5 fw-bold">
+                            SNAKES AND LADDERS
+                        </div>
+                        <div id="room_controls">
+                            <span class="badge d-flex fs-6 align-items-center text-bg-primary rounded-pill">
+                                <strong>ROOM ID:</strong>&ensp;<span id="room_id_dsp" class="" >???</span>
+                                <i id="btn_copy" class="btn btn-primary fa-solid fa-copy" onclick="copy_room_id()" title="copy"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row p-2">
+                        <div class="col-2">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <div class="text-center">
+                                        <img class="player-ava" id="p1_img" src="../images/snakes-and-ladders/unknown.png">
+                                        <div><span id="p1_name" class="card-text player-name">???</span></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="btn-group">
+                                        <!--a id="p1_pass_turn" class="btn btn-sm btn-outline-secondary d-none" onclick="">PASS</a-->
+                                        </div>
+                                        <div class="indc" id="p1_indc"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br/>
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <div class="text-center">
+                                        <img class="player-ava" id="p3_img" src="../images/snakes-and-ladders/unknown.png">
+                                        <div><span id="p3_name" class="card-text player-name">???</span></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="btn-group">
+                                        <!--a id="p3_pass_turn" class="btn btn-sm btn-outline-secondary d-none" onclick="">PASS</a-->
+                                        </div>
+                                        <div class="indc" id="p3_indc"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-8 text-center">
+                            <div class="row h-80">
+                                <div class="col-12 p-3">
+                                    <div id="game_board"></div>
+                                </div>
+                            </div>
+                            
+                            <div id="game_controls" class="fixed-bottom mt-5 w-100">
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <td style="width:200px;background-color:black;text-align: center;">
+                                            <img class="d-none" id="dice_anim" src="../images/snakes-and-ladders/dice-anim.gif" width="120px" height="120px">
+                                            <img class="button-mode" id="dice_static" src="../images/snakes-and-ladders/dice_1.png" onclick="on_draw_dice()" width="120px" height="120px">
+											<label id="act_ind">&nbsp;</label>
+                                        </td>
+                                        <td style="width: 500px;text-align: center;">
+                                            <h2 id="game_msg">&nbsp;</h2>
+                                            <button id="btn_play" class="btn btn-primary mt-2" onclick="start_game()">START</button>
+                                        </td>
+                                        <td  style="width:200px;background-color:black;text-align: center;">
+                                            <img id="dice" src="../images/snakes-and-ladders/unknown.png" width="120px" height="120px">
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="col-2">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <div class="text-center">
+                                        <img class="player-ava" id="p2_img" src="../images/snakes-and-ladders/unknown.png">
+                                        <div><span id="p2_name" class="card-text player-name">???</span></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="btn-group">
+                                        <!--a id="p2_pass_turn" class="btn btn-sm btn-outline-secondary d-none" onclick="">PASS</a-->
+                                        </div>
+                                        <div class="indc" id="p2_indc"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br/>
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <div class="text-center">
+                                        <img class="player-ava" id="p2_img" src="../images/snakes-and-ladders/unknown.png">
+                                        <div><span id="p4_name" class="card-text player-name">???</span></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="btn-group">
+                                        <!--a id="p4_pass_turn" class="btn btn-sm btn-outline-secondary d-none" onclick="">PASS</a-->
+                                        </div>
+                                        <div class="indc" id="p4_indc"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>    
+            </div>
+
+            
+        </div>                            
+	</body>
+
+	<script src="/socket.io/socket.io.js"></script>
+    <script src="../assets/dist/js/jquery-3.6.3.js"></script>
+    <script src="../assets/js/scripts.js"></script>
+	<script>
+        let img_dir = "../images/snakes-and-ladders/";
+        let player_piece = "";
+        let room_data = {};
+        let player_turn = false;
+        let ind_arr;
+        let draw_timer;
+        let room_index = [
+            ["title","SNAKES AND LADDERS"], 
+            ["id","room_id"], 
+            ["max_players",4],
+            ["min_players",2],
+            ["t_limit",3600], 
+            ["turn","int"],
+            ["winner","int"],
+            ["status", ""]
+        ];
+        let player_index = [
+            ["pid","player_ind"], 
+            ["name",player_name], 
+            ["status","active"], 
+            ["char","string"],
+            ["score","int"]
+        ];
+
+        function draw_stop(){
+            let rnd = get_random_num(6);
+            let rot = get_random_num(180);
+
+            $('#dice_static').css({
+				'transform': 'rotate(' + rot + 'deg)',
+				'-ms-transform': 'rotate(' + rot + 'deg)',
+				'-moz-transform': 'rotate(' + rot + 'deg)',
+				'-webkit-transform': 'rotate(' + rot + 'deg)',
+				'-o-transform': 'rotate(' + rot + 'deg)'
+			}); 
+			$("#dice_static").attr('src', '../images/snakes-and-ladders/dice_'+rnd+'.png');
+
+            $("#dice_static").removeClass('d-none');
+            $("#dice_anim").addClass('d-none');
+            $("#dice_static").removeClass('d-none');
+            $("#act_ind").html("TAP HERE");
+            clearInterval(draw_timer);
+        }
+
+        function on_draw_dice(){
+            $("#dice_anim").removeClass('d-none');
+            $("#dice_static").addClass('d-none');
+            $("#act_ind").html("&nbsp;");
+
+            draw_timer = setInterval(draw_stop, 1000);
+        }
+
+        function set_board(){
+			let str = "";
+			for(let g=1; g<=100; g++){
+				str = "<div class='board-cell' id='g_"+g+"'></div>"+str;
+			}
+			
+            $("#game_board").html(str);
+
+			let posx = 0;
+			let posy = 0;
+			for(let j=100; j>0; j--){
+					$("#g_"+j).css('background-image', 'url("../images/snakes-and-ladders/board.png")');
+					$("#g_"+j).css('background-size', '450px 450px');
+					$("#g_"+j).css('background-repeat', 'no-repeat');
+
+					
+					$("#g_"+j).css('background-position-x', posx-1);
+					$("#g_"+j).css('background-position-y', posy-1);
+					if(450 == Math.abs(posx)+45){
+						posy -= 45;
+						posx = 0;
+					}
+					else{
+						posx -= 45;
+					}
+			}
+			
+		}
+
+        socket.on('room_data', function(data) {
+            let str = "";
+            if(data == "room-error"){
+                alert("Room error problem occured. [Room doesn't exist]");
+            }
+            else{
+                console.log(data);
+                let obj = Object.keys(data);
+                $("#game").removeClass("d-none");
+                $("#room_id_dsp").html(data['id']);
+
+                for(i=1; i<=obj.length; i++){
+                    try{
+                        $("#p"+i+"_name").html(data[i]['name']);
+                        $("#p"+i+"_img").attr('src', img_dir+"ava-"+data[i]['pid']+".png");
+                        $("#p"+i+"_block").html(data[i]['block']);
+
+                        /*if(data['status'] == 'begin'){
+                            if(data['winner'] == ""){
+                                if(data['turn'] == data[i]['pid']){
+                                    move_index = i;
+                                    $("#p"+i+"_indc").addClass("blinker");
+                                }
+                                else{
+                                }
+                                
+                            }
+                        }
+
+                        player_cnt++;*/
+                    }
+                    catch(e){
+                        $("#p"+i+"_name").html("???");
+                        $("#p"+i+"_img").attr('src', img_dir+"unknown.png");
+                        if(data['status'] == 'begin'){
+                            $("#p"+i+"_ava").addClass("d-none");
+                        }
+                        else{
+                            $("#p"+i+"_ava").removeClass("d-none");
+                        }
+                    }
+                }
+                room_data = data;
+                
+                if(ind_arr[1] == data['turn']){
+                    player_turn = true;
+                }
+                else{
+                    player_turn = false;
+                }
+            }
+        });
+
+        function init_game(stat){
+            $("#game_portal").addClass("d-none");
+            $("#game").addClass("d-none");
+
+            if(stat == "portal"){
+                $("#game_portal").removeClass("d-none");
+            }
+            else if(stat == "game"){
+                socket.emit("command", ["get", "update", ind_arr[0], parseInt(ind_arr[1]), "*"]);
+                $("#game").removeClass("d-none");
+                $("#dice_static").attr('src', '../images/snakes-and-ladders/dice_'+get_random_num(6)+'.png');
+                set_board();
+            }
+        }
+
+        window.onload = function(){
+            if(player_name == null){
+                $("body").css("textAlign", "center");
+                $("body").css("paddingTop", "20px");
+                $("body").html("Invalid access!");
+            }
+            else{
+                ind_arr = get_session("session");
+                if(ind_arr.length == 0){
+                    init_game('portal');
+                }
+                else{
+                    socket.emit("rejoin_room", ["set", "resume", ind_arr[0], ind_arr[1]], "*");
+                    init_game('game');
+                }    
+            }       
+        }
+
+        window.onbeforeunload = function(){
+            if(ind_arr.length != 0){
+                socket.emit("command", ["set", "suspend", ind_arr[0], parseInt(ind_arr[1]), "*"]);
+            }
+        }
+
+	</script>
+</html>

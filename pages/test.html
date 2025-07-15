@@ -1,0 +1,361 @@
+<html>
+    <link href="../assets/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<title>Data Test Server</title>
+	<style>
+        .ctrl-keys {
+            padding: 2px 7px 2px 7px;
+            margin: 0px 5px 0px 5px;
+            width: 30px;
+        }
+        .stp-keys {
+            padding: 2px 7px 2px 7px;
+            margin: 0px 15px 0px 15px;
+            font-size: 11px;
+            width: 50px;
+        }
+        .arw-keys {
+            padding: 2px 7px 2px 7px;
+            font-size: 12px;
+            width: 30px;
+        }
+
+        #game_view {
+            border: solid 1px;
+        }
+
+        #game_controller {
+            background-color: maroon;
+            margin: auto;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        #p2_char {
+            margin-right: 0px;
+            transform: scaleX(-1);
+        }
+	</style>
+	
+	<body>
+        <div id="game_portal">
+        <button onclick="create_room()">CREATE ROOM</button>
+        <br/><br/>
+        <input type="text" id="room_id" placeholder="room id">
+        <button onclick="join_room()">JOIN ROOM</button>
+        </div>
+
+        <div id="game_control">
+        <table id="game_view" class="w-100">
+            <tr>
+                <td style="text-align: center;"><img id="p1_char" src="../images/ryu_fight_pos.gif" height="200px"></td>
+                <td style="text-align: center;"><img id="p2_char" src="../images/ryu_fight_pos.gif" height="200px"></td>
+            </tr>
+            <tr>
+                <td colspan="2" style="background-color: maroon;">
+                    <table id="game_controller">
+                        <tr>
+                            <td></td>
+                            <td><button id="arw_up" class="arw-keys" onmousedown="player_command('up')" onmouseup="player_command_cancel('up')">↑</button></td>
+                            <td></td>
+                            <td colspan="4"></td>
+                        </tr>
+                        <tr>
+                            <td><button id="arw_left" class="arw-keys" onmousedown="player_command('left')" onmouseup="player_command_cancel('left')">←</button></td>
+                            <td></td>
+                            <td><button id="arw_right" class="arw-keys" onmousedown="player_command('right')" onmouseup="player_command_cancel('right')">→</button></td>
+                            <td><button id="stp_sel" class="stp-keys">SELECT</button></td>
+                            <td><button id="stp_str" class="stp-keys">START</button></td>
+                            <td><button id="ctrl_a" class="ctrl-keys" onmousedown="player_command('punch')" onmouseup="player_command_cancel('punch')">A</button></td>
+                            <td><button id="ctrl_b" class="ctrl-keys" onmousedown="player_command('kick')" onmouseup="player_command_cancel('kick')">B</button></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td><button id="arw_dwn" class="arw-keys" onmousedown="player_command('down')" onmouseup="player_command_cancel('down')">↓</button></td>
+                            <td></td>
+                            <td colspan="4"></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>  
+        <button style="margin:5px;"  onmousedown="view_keys('view')" onmouseup="view_keys('hide')">Keyboard Mapping</button>     
+        </div>
+
+        <br/><br/>CONSOLE<br/>
+        <textarea id="txt_console" rows="5" style="width: 100%;" readonly></textarea>
+	</body>
+
+	<script src="/socket.io/socket.io.js"></script>
+    <script src="../assets/dist/js/jquery-3.6.3.js"></script>
+	<script>
+		let socket = io();
+        const url = window.location.href;
+        const player_name = sessionStorage.getItem("user");
+        
+        let action = "";
+        let room_id = "";
+        let player_id = "";
+        let in_game = false;
+        let index_name = {'id':'ROOM ID', 'stamp':'TIMESTAMP', 'pid':'Player ID', 'name':'Name', 'status':'Status', 'data':'Player Data'}
+        let errors = {
+            'room-error-1':"Invalid room id!", 'room-error-2':"Room is full!"
+        }
+
+        let room_index;
+        let player_index;
+      
+        let cur_key = "";
+        $(this).keydown(function(event){
+            if(cur_key == "" && in_game){
+                cur_key = event.key;
+                if(event.key == 'w'){
+                    player_command('up');
+                }
+                else if(event.key == 's'){
+                    player_command('down');
+                }
+                else if(event.key == 'a'){
+                    player_command('left');
+                }
+                else if(event.key == 'd'){
+                    player_command('right');
+                }
+                else if(event.key == 'n'){
+                    player_command('punch');
+                }
+                else if(event.key == 'm'){
+                    player_command('kick');
+                }
+            }
+        });
+
+        $(this).keyup(function(event){
+            if(in_game){
+                if(event.key == 'w'){
+                    player_command_cancel('up');
+                }
+                else if(event.key == 's'){
+                    player_command_cancel('down');
+                }
+                else if(event.key == 'a'){
+                    player_command_cancel('left');
+                }
+                else if(event.key == 'd'){
+                    player_command_cancel('right');
+                }
+                else if(event.key == 'n'){
+                    player_command_cancel('punch');
+                }
+                else if(event.key == 'm'){
+                    player_command_cancel('kick');
+                }
+                cur_key = "";
+            }
+        });
+
+        function view_keys(cmd){
+            if(cmd == "view"){
+                $("#arw_up").html('W');
+                $("#arw_dwn").html('S');
+                $("#arw_left").html('A');
+                $("#arw_right").html('D');
+                $("#stp_sel").html('C');
+                $("#stp_str").html('V');
+                $("#ctrl_a").html('N');
+                $("#ctrl_b").html('M');
+            }
+            else{
+                $("#arw_up").html('↑');
+                $("#arw_dwn").html('↓');
+                $("#arw_left").html('←');
+                $("#arw_right").html('→');
+                $("#stp_sel").html('SELECT');
+                $("#stp_str").html('START');
+                $("#ctrl_a").html('A');
+                $("#ctrl_b").html('B');
+            }
+        }
+
+        function player_command(cmd){
+            let ind_arr = get_session();
+            action = "action";
+            socket.emit("command", ["set", "action", ind_arr[0], parseInt(ind_arr[1]), "*", cmd]);
+        }
+
+        function player_command_cancel(cmd){
+            let ind_arr = get_session();
+            action = "action";
+            socket.emit("command", ["set", "action", ind_arr[0], parseInt(ind_arr[1]), "*", ""]);
+        }
+
+        function act(ind, cmd){
+            let ind_arr = get_session();
+            if(cmd == "up"){
+                $("#p"+ind+"_char").attr('src','../images/ryu_jump.gif')
+            }
+            else if(cmd == "down"){
+                $("#p"+ind+"_char").attr('src','../images/ryu_crouch.gif')
+            }
+            else if(cmd == "left"){
+                $("#p"+ind+"_char").css('transform','scaleX(-1)');
+            }
+            else if(cmd == "right"){
+                $("#p"+ind+"_char").css('transform','scaleX(1)');
+            }
+            else if(cmd == "punch"){
+                $("#p"+ind+"_char").attr('src','../images/ryu_punch.gif')
+            }
+            else if(cmd == "kick"){
+                $("#p"+ind+"_char").attr('src','../images/ryu_kick.gif')
+            }
+            else{
+                $("#p"+ind+"_char").attr('src','../images/ryu_fight_pos.gif')
+            }
+            $("#txt_console").html(cmd);
+        }
+
+        function get_session(){
+            let session = sessionStorage.getItem("session");
+            let game_session = []
+            if(session != null){
+                game_session = session.split('-');
+            }
+            
+            return game_session;
+        }
+
+        function set_session(val){
+            if(val == ""){
+                sessionStorage.clear("session");
+            }
+            else{
+                sessionStorage.setItem("session", val);
+            }
+        }
+
+        function format_session(data){
+            let str = "";
+            for(i=0; i<data.length; i++){
+                str += data[i];
+                if(i<data.length-1)
+                    str += "-";
+            }
+            set_session(str);
+        }
+
+        function create_room(){
+            action = "create";
+
+            room_index = [["title","Test game server comm"], ["id","room_id"], ["max_players",2], ["t_limit",3600]];
+            player_index = [["pid","player_ind"], ["name",player_name], ["status","active"], ["data","array"], ["action","string"]];
+            socket.emit("create_room", ["set_cookie", room_index, player_index]); 
+        }
+
+        function join_room(){
+            action = "join";
+            let form_res = check_forms();
+            if (form_res == true){
+                player_index = [["pid","player_ind"], ["name",player_name], ["status","active"], ["data","array"], ["action","string"]];
+                socket.emit("join_room", ["set_cookie", $("#room_id").val(), player_index]);
+            }
+            else{
+                alert(form_res);
+            }
+        }
+
+        function check_forms(){
+            let chk_res = true;
+            if(action == "join"){
+                if($("#room_id").val() == "")
+                    chk_res = "Invalid room id!";
+            }
+
+            return chk_res;
+        }
+
+        function check_action(data){
+            let chk_res = errors[data];
+            if(chk_res == undefined)
+                return true;
+            else
+                return false;
+        }
+
+        socket.on('set_cookie', function(data) {
+            if(errors[data] == undefined){
+                format_session(data);
+                window.location = url;
+            }
+            else{
+                $("#txt_console").html(errors[data]);
+            }
+        });
+
+        socket.on('room_data', function(data) {
+            let str = "";
+            if(data == "room-error"){
+                alert("Room error problem occured. [Room doesn't exist]");
+            }
+            else{
+                let obj = Object.keys(data);
+                str = "ROOM ID: "+data['id']+"  Current Players: "+data['players']+"\n";
+                for(i=1; i<=obj.length; i++){
+                    try{
+                        str += "Player: "+data[String(i)]['pid']+"       ";
+                        str += "Name: "+data[String(i)]['name']+"       ";
+                        str += "Action: "+data[String(i)]['action']+"       ";
+                        str += "Status: "+data[String(i)]['status']+"\n";
+                        
+                        if(action = 'action'){
+                            act(i, data[String(i)]['action']);
+                        }
+                    }catch(e){}
+                }
+                in_game = true;
+            }
+            $("#txt_console").html(str);
+        });
+
+        function init_game(stat){
+            $("#game_portal").addClass("d-none");
+            $("#game_control").addClass("d-none");
+
+            if(stat == "portal"){
+                $("#game_portal").removeClass("d-none");
+            }
+            else if(stat == "game"){
+                let ind_arr = get_session();
+                socket.emit("command", ["get", "update", ind_arr[0], parseInt(ind_arr[1]), "*"]);
+                $("#game_control").removeClass("d-none");
+            }
+        }
+
+        window.onload = function(){
+            if(player_name == null){
+                $("body").css("textAlign", "center");
+                $("body").css("paddingTop", "20px");
+                $("body").html("Invalid access!");
+            }
+            else{
+                let ind_arr = get_session();
+                if(ind_arr.length == 0){
+                    init_game('portal');
+                }
+                else{
+                    socket.emit("rejoin_room", ["set", "resume", ind_arr[0], ind_arr[1]], "*");
+                    init_game('game');
+                }    
+            }       
+        }
+
+        window.onbeforeunload = function(){
+            let ind_arr = get_session();
+            if(ind_arr.length != 0){
+                socket.emit("command", ["set", "suspend", ind_arr[0], parseInt(ind_arr[1]), "*"]);
+            }
+        }
+
+        
+	</script>
+</html>

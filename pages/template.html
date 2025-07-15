@@ -1,0 +1,134 @@
+<html>
+    <link href="../assets/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<link href="../assets/css/mystyle.css" rel="stylesheet">
+    <title>GAME TITLE</title>
+	<style>
+        
+	</style>
+	<body>
+        <div class="container">	
+            <div id="game_portal" class="row align-center h-100 d-none">
+                <div class="menu col-6 text-center">
+                    <span>
+                        <button id="btn_create" class="btn btn-primary" onclick="create_room()">CREATE</button>
+                    </span>
+                </div>
+                <div class="menu col-6 text-center">
+                    ROOM ID:
+                    <br/>
+                    <input id="room_id" class="inp">
+                    <br/><br/>
+                    <button id="btn_join" class="btn btn-primary" onclick="join_room()">JOIN</button>
+                </div>
+            </div>
+
+            <div id="game" class="d-none">
+                <div class="row bg-primary">
+                    <div class="p-2 d-flex justify-content-between">
+                        <div class="col text-white fs-5 fw-bold">
+                            GAME TITLE
+                        </div>
+                        <div id="room_controls">
+                            <span class="badge d-flex fs-6 align-items-center text-bg-primary rounded-pill">
+                                <strong>ROOM ID:</strong>&ensp;<span id="room_id_dsp" class="" >???</span>
+                                <i id="btn_copy" class="btn btn-primary fa-solid fa-copy" onclick="copy_room_id()" title="copy"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+	</body>
+
+	<script src="/socket.io/socket.io.js"></script>
+    <script src="../assets/dist/js/jquery-3.6.3.js"></script>
+    <script src="../assets/js/scripts.js"></script>
+	<script>
+        let img_dir = "../images/game-name/";
+        let player_piece = "";
+        let room_data = {};
+        let player_turn = false;
+        let ind_arr;
+        let room_index = [
+            ["title","GAME TITLE"], 
+            ["id","room_id"], 
+            ["max_players",4],
+            ["min_players",2],
+            ["t_limit",3600], 
+            ["turn","int"],
+            ["winner","int"],
+            ["status", ""]
+        ];
+        let player_index = [
+            ["pid","player_ind"], 
+            ["name",player_name], 
+            ["status","active"], 
+            ["piece","string"],
+            ["score","int"]
+        ];
+
+        socket.on('room_data', function(data) {
+            let str = "";
+            if(data == "room-error"){
+                alert("Room error problem occured. [Room doesn't exist]");
+            }
+            else{
+                console.log(data);
+                let obj = Object.keys(data);
+                $("#game").removeClass("d-none");
+                $("#room_id_dsp").html(data['id']);
+
+                for(i=1; i<=obj.length; i++){
+                    
+                }
+                room_data = data;
+                
+                if(ind_arr[1] == data['turn']){
+                    player_turn = true;
+                }
+                else{
+                    player_turn = false;
+                }
+            }
+        });
+
+        function init_game(stat){
+            $("#game_portal").addClass("d-none");
+            $("#game").addClass("d-none");
+
+            if(stat == "portal"){
+                $("#game_portal").removeClass("d-none");
+            }
+            else if(stat == "game"){
+                socket.emit("command", ["get", "update", ind_arr[0], parseInt(ind_arr[1]), "*"]);
+                $("#game").removeClass("d-none");
+            }
+        }
+
+        window.onload = function(){
+            if(player_name == null){
+                $("body").css("textAlign", "center");
+                $("body").css("paddingTop", "20px");
+                $("body").html("Invalid access!");
+            }
+            else{
+                ind_arr = get_session("session");
+                if(ind_arr.length == 0){
+                    init_game('portal');
+                }
+                else{
+                    socket.emit("rejoin_room", ["set", "resume", ind_arr[0], ind_arr[1]], "*");
+                    init_game('game');
+                }    
+            }       
+        }
+
+        window.onbeforeunload = function(){
+            if(ind_arr.length != 0){
+                socket.emit("command", ["set", "suspend", ind_arr[0], parseInt(ind_arr[1]), "*"]);
+            }
+        }
+
+	</script>
+</html>

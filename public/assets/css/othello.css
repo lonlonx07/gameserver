@@ -1,0 +1,122 @@
+		.player-ava {
+			width: 150px;
+			height: 150px;
+			padding: 5px;
+		}
+
+		.player-name {
+			font-weight: 600;
+			width: 100%;
+			padding: 3px;
+		}
+
+		#game_board {
+			display: grid;
+			grid-template-columns: auto auto auto;
+			width: 300px;
+			height: 300px;
+			margin: auto;
+			
+		}
+
+		#game_board > div {
+			background-color: #f1f1f1;
+			border: 1px solid black;
+			font-size: 30px;
+			text-align: center;
+			width: 100px;
+			height: 100px;
+		}
+
+		#p1_indc, #p2_indc {
+			border-radius: 25px;
+			width: 25px;
+			height: 25px;
+			background-color: red;
+			background-image: radial-gradient(red, rgb(234, 184, 184), gray);
+		}
+
+		#room_id_dsp {
+			/*background-color: #ffffff;*/
+			margin-left: 5px;
+			margin-right: 5px;
+		}
+		
+		.blinker {
+			animation: turn_indc 2s infinite;
+		}
+
+@keyframes turn_indc {
+	from {
+		background-color: gray;
+		background-image: radial-gradient(white, gray)
+	}
+	to {
+		background-color: rgb(14, 194, 14);
+		background-image: radial-gradient(rgb(14, 194, 14), rgb(133, 237, 133), gray)
+	}
+}
+
+#game_board {
+	display: grid;
+	grid-template-columns: auto auto auto auto auto auto auto auto;
+	width: 400px;
+	height: 400px;
+	margin: auto;		
+}
+
+#game_board > div {
+	background-color: #08944e;
+	border: 1px solid black;
+	font-size: 12px;
+	text-align: center;
+	width: 50px;
+	height: 50px;
+}
+
+.flip-card {
+			background-color: transparent;
+			width: 40px;
+			height: 40px;
+			perspective: 1000px;
+		}
+
+		.flip-card-inner {
+			position: relative;
+			width: 100%;
+			height: 100%;
+			text-align: center;
+			transition: transform 0.6s;
+			transform-style: preserve-3d;
+		}
+
+		.flip-anim {
+			animation-name: flip_piece;
+  			animation-duration: 1s;
+		}
+
+		@keyframes flip_piece {
+			from {transform: rotateY(0deg);}
+			to {transform: rotateY(180deg);}
+		}
+
+		.flip-card-front, .flip-card-back {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			-webkit-backface-visibility: hidden;
+			backface-visibility: hidden;
+		}
+
+		.flip-card-front {
+			color: black;
+		}
+
+		.flip-card-back {
+			color: white;
+			transform: rotateY(180deg);
+		}
+
+		.flip-card-target {
+			transform: rotateY(180deg);
+		}

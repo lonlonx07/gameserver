@@ -1,0 +1,354 @@
+<html>
+    <link href="../assets/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<link href="../assets/css/mystyle.css" rel="stylesheet">
+    <link href="../assets/css/tic-tac-toe.css" rel="stylesheet">
+    <title>TIC TAC TOE</title>
+	<style>
+        
+	</style>
+	
+	<body>
+        <div class="container-fluid">	
+            <div id="game_portal" class="row align-center h-100">
+                <div class="menu col-6 text-center">
+                    <span>
+                        <button id="btn_create" class="btn btn-primary" onclick="create_room()">CREATE</button>
+                    </span>
+                </div>
+                <div class="menu col-6 text-center">
+                    ROOM ID:
+                    <br/>
+                    <input id="room_id" class="inp">
+                    <br/><br/>
+                    <button id="btn_join" class="btn btn-primary" onclick="join_room()">JOIN</button>
+                </div>
+            </div>
+
+            <div id="game" class="d-none">
+                    <div class="row bg-primary">
+                        <div class="p-2 d-flex justify-content-between">
+                            <div class="col text-white fs-5 fw-bold">
+                                TIC TAC TOE
+                            </div>
+                            <div id="room_controls">
+                                <span class="badge d-flex fs-6 align-items-center text-bg-primary rounded-pill">
+                                    <strong>ROOM ID:</strong><span id="room_id_dsp" class="" >???</span>
+                                    <i id="btn_copy" class="btn btn-primary fa-solid fa-copy" onclick="copy_room_id()" title="copy"></i>
+                                </span>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <div class="row p-2">
+                        <div class="col-2">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <div class="text-center">
+                                        <img class="player-ava" id="p1_img" src="../images/tic-tac-toe/unknown.png">
+                                        <span id="p1_name" class="card-text player-name">???</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="btn-group">
+                                        <!--a class="btn btn-sm btn-outline-secondary" target="_blank">QUIT</a-->
+                                        </div>
+                                        <div class="indc" id="p1_indc"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-8 text-center">
+                            <div id="scoring_table">
+                                <h1>SCORE</h2>
+                                <br/>
+                                <h2><label id="p1_sco">0</label> | <label id="p2_sco">0</label></h2>
+                            </div>
+                            
+                            <div id="game_controls" class="d-none">
+                                <h2 id="game_msg">&nbsp;</h2>
+                                <button id="btn_play" class="btn btn-primary mt-2" onclick="start_game()">START</button>
+                            </div>
+                        </div>
+
+                        <div class="col-2">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <div class="text-center">
+                                        <img class="player-ava" id="p2_img" src="../images/tic-tac-toe/unknown.png">
+                                        <p id="p2_name" class="card-text player-name">???</p>
+                                    </div>	
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="btn-group">
+                                        <!--a class="btn btn-sm btn-outline-secondary" target="_blank">QUIT</a-->
+                                        </div>
+                                        <div class="indc" id="p2_indc"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" class="">
+                        <div class="col">
+                            <div id="game_board"></div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+	</body>
+
+	<script src="/socket.io/socket.io.js"></script>
+    <script src="../assets/dist/js/jquery-3.6.3.js"></script>
+    <script src="../assets/js/scripts.js"></script>
+	<script>
+        let img_dir = "../images/tic-tac-toe/";
+        let player_piece = "";
+        let room_data = {};
+        let player_turn = false;
+        let ind_arr;
+        let room_index = [
+            ["title","TIC TAC TOE"], 
+            ["id","room_id"], 
+            ["max_players",2],
+            ["min_players",2],
+            ["t_limit",3600], 
+            ["turn",1],
+            ["board", ['','','','','','','','','']],
+            ["patern", ['012','345','678','036','147','258','048','246']],
+            ["winner", "int"],
+            ["status", ""]
+        ];
+        let player_index = [
+            ["pid","player_ind"], 
+            ["name",player_name], 
+            ["status","active"], 
+            ["piece","string"],
+            ["score","int"]
+        ];
+
+        function start_game(){
+            $("#p"+room_data['turn']+"_indc").addClass('blinker');
+            room_data['status'] = "begin";
+            room_data['winner'] = 0;
+            room_data['board'] = ['','','','','','','','',''];
+            socket.emit("command", ["set", "update", ind_arr[0], "", "*", room_data]);
+        }
+
+        function check_posible_moves(){
+            let sets = room_data['patern'];
+            let board_simu = [];
+            let board_simu2 = [];
+            for (let i=0; i<room_data['board'].length; i++){
+                if(room_data['board'][i] == ''){
+                    board_simu[i] = 'X';
+                    board_simu2[i] = 'O';
+                }
+                else{
+                    board_simu[i] = room_data['board'][i];
+                    board_simu2[i] = room_data['board'][i];
+                }
+            }
+            
+            let posibility = false;
+            for (let i=0; i<sets.length; i++){
+                let arr = (sets[i]).split("");
+                let str = "";
+                let str2 = "";
+                for (let j=0; j<arr.length; j++){
+                    str += board_simu[parseInt(arr[j])];
+                    str2 += board_simu2[parseInt(arr[j])];
+                }
+                if(str == "XXX" || str2 == "OOO" || str == "OOO" || str2 == "XXX")
+                    posibility = true;
+            }
+
+            if(posibility == false){
+                room_data['status'] = "draw";
+                socket.emit("command", ["set", "update", ind_arr[0], "", "*", room_data]);
+            }
+            
+        }
+
+        function check_board(){
+            let sets = room_data['patern'];
+
+            for (let i=0; i<sets.length; i++){
+                let arr = (sets[i]).split("");
+                let str = "";
+                for (let j=0; j<arr.length; j++){
+                    str += room_data['board'][parseInt(arr[j])];
+                }
+                
+                if(str == "XXX" || str == "OOO"){
+                    room_data['winner'] = ind_arr[1];
+                    room_data[ind_arr[1]]['score']++;
+                    break;
+                }
+            }
+        }
+
+        function set_grid(ind){
+			if(player_turn && room_data['status'] == "begin" && room_data['board'][ind] == ''){
+                room_data['board'][ind] = player_piece;
+                check_board();
+                if(room_data['turn'] == 1)
+                    room_data['turn'] = 2;
+                else
+                    room_data['turn'] = 1;
+
+                socket.emit("command", ["set", "update", ind_arr[0], "", "*", room_data]);
+			}
+		}
+
+        function set_board(){
+			let str = "";
+			for(let g=0; g<9; g++){
+				str += "<div id='g"+g+"' onclick='set_grid("+g+")'></div>";
+			}
+			
+            $("#game_board").html(str);
+		}
+
+        function set_controls(){
+            if(room_data['status'] != ""){
+                $("#btn_play").html("PLAY AGAIN");
+            }
+
+            if(room_data['status'] == "begin"){
+                $("#game_controls").addClass("d-none");
+                $("#scoring_table").removeClass("d-none");
+            }
+            else {
+                if(room_data['players'] == room_data['min_players']){
+                    
+                    $("#scoring_table").removeClass("d-none");
+                    $("#game_controls").removeClass("d-none");
+                    //$("#room_controls").addClass("d-none");
+                }
+                else{
+                    $("#game_controls").addClass("d-none");
+                    $("#scoring_table").addClass("d-none");
+                    //$("#room_controls").removeClass("d-none");
+                }
+                let tmp_msg = "";
+                if(room_data['status'] == "end"){
+                    tmp_msg = "Winner "+room_data[room_data['winner']]['name'];
+                }
+                else if(room_data['status'] == "draw"){
+                    tmp_msg = "Draw";
+                }
+                
+                $("#game_msg").html(tmp_msg);
+            }
+        }
+
+        socket.on('room_data', function(data) {
+
+            let str = "";
+            if(data == "room-error"){
+                alert("Room error problem occured. [Room doesn't exist]");
+            }
+            else{
+                let obj = Object.keys(data);
+                $("#room_id_dsp").html(data['id']);
+                player_piece = data[ind_arr[1]]['piece'];
+
+                for(i=1; i<=obj.length; i++){
+                    try{
+                        console.log(img_dir+data[obj[i-1]]['piece']+".png")
+                        $("#p"+obj[i-1]+"_img").attr("src", img_dir+data[obj[i-1]]['piece']+".png");
+                        $("#p"+obj[i-1]+"_name").html(data[obj[i-1]]['name']);
+                        $("#p"+obj[i-1]+"_sco").html(data[obj[i-1]]['score']);
+                    }catch(e){}
+                }
+                room_data = data;
+                
+                if(ind_arr[1] == data['turn']){
+                    player_turn = true;
+                }
+                else{
+                    player_turn = false;
+                }
+
+                $(".indc").removeClass('blinker');
+                if(data['status'] == "begin"){
+                    $("#p"+data['turn']+"_indc").addClass('blinker');
+                }
+
+                if(data['board'] != undefined){
+                    let board = data['board'];
+                    for(i=0; i<board.length; i++){
+                        if(board[i] == '')
+                            $("#g"+i).css('background-image', 'none');
+                        else
+                            $("#g"+i).css('background-image', 'url("'+img_dir+board[i]+'.png")');
+                            $("#g"+i).css('background-size', '70px 70px');
+                            $("#g"+i).css('background-repeat', 'no-repeat');
+                            $("#g"+i).css('background-position', 'center');
+                    }
+                    
+                    if(room_data['winner'] != 0){
+                        room_data['status'] = "end";
+                    }
+
+                    set_controls();
+                    $(".indc").removeClass('blinker');
+                    if(data['status'] == "begin"){
+                        $("#p"+data['turn']+"_indc").addClass('blinker');
+                        check_posible_moves();
+                    }
+
+                }
+
+                in_game = true;
+            }
+        });
+
+        function init_game(stat){
+            $("#game_portal").addClass("d-none");
+            $("#game").addClass("d-none");
+
+            if(stat == "portal"){
+                $("#game_portal").removeClass("d-none");
+            }
+            else if(stat == "game"){
+                let tmp_piece;
+                if(ind_arr[1] == 1){
+                    tmp_piece = 'X';
+                }
+                else{
+                    tmp_piece = 'O';
+                }
+
+                socket.emit("command", ["set", "piece", ind_arr[0], parseInt(ind_arr[1]), "*", tmp_piece]);
+                $("#game").removeClass("d-none");
+                set_board();
+            }
+        }
+
+        window.onload = function(){
+            if(player_name == null){
+                $("body").css("textAlign", "center");
+                $("body").css("paddingTop", "20px");
+                $("body").html("Invalid access!");
+            }
+            else{
+                ind_arr = get_session("session");
+                if(ind_arr.length == 0){
+                    init_game('portal');
+                }
+                else{
+                    socket.emit("rejoin_room", ["set", "resume", ind_arr[0], ind_arr[1]], "*");
+                    init_game('game');
+                }    
+            }       
+        }
+
+        window.onbeforeunload = function(){
+            if(ind_arr.length != 0){
+                socket.emit("command", ["set", "suspend", ind_arr[0], parseInt(ind_arr[1]), "*"]);
+            }
+        }
+
+	</script>
+</html>

@@ -1,0 +1,177 @@
+<html>
+    <link href="../assets/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<title>Server Monitor</title>
+	<style>
+        #room_list {
+            /*background-color: black;*/
+            margin-bottom: 3px;
+            color: gray;
+        }
+        .room_list_item {
+            border: solid 1px;
+            margin-bottom: 5px;
+            padding: 5px;
+            width: 100%;
+        }
+	</style>
+	
+	<body>
+            <div class="modal modal-sheet position-absolute d-block bg-body-secondary p-4 py-md-5" tabindex="-1" role="dialog" id="modalEnterName">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content rounded-4 shadow">
+						<div class="modal-header p-5 pb-4 border-bottom-0 align-items-center">
+							<h1 class="fw-bold mb-0 fs-2">Enter your access key</h1>
+						</div>
+						<div class="modal-body p-5 pt-0">
+							<div class="form-floating mb-3">
+								<input type="password" class="form-control rounded-3" id="inp_key" placeholder="">
+								<label for="inp_name">Key Code</label>
+							</div>
+							<button class="w-100 mb-2 btn btn-lg rounded-3 btn-primary" onclick="init_access_key()">Enter</button>
+						</div>
+					</div>
+				</div>
+			</div>
+        <div id="server_stats">
+            <h2>Server Monitor</h2>
+            <table class="table table-bordered">
+                <col width="25%"/>
+                <col width="75%"/>
+                <tr>
+                    <th>Rooms</th>
+                    <td style="text-align: right;color:gray;font-style:italic;"><small>( <label id="player_onl">0</label> ) Player Currently Playing...</small></td>
+                </tr>
+                <tr>
+                    <td id="room_list"></td>
+                    <td id="player_list"></td>
+                </tr>
+            </table>
+        </div>
+        <div class="d-flex justify-content-between position-fixed bottom-0 end-0 w-100">
+            
+                <button class="btn btn-success m-3" onclick="refresh_page()">REFRESH</button>
+                <button class="btn btn-danger m-3" onclick="clear_inactive_rooms()">DELETE INACTIVE ROOMS</button>
+            
+        </div>
+	</body>
+
+	<script src="/socket.io/socket.io.js"></script>
+    <script src="../assets/dist/js/jquery-3.6.3.js"></script>
+	<script>
+		let socket = io();
+        const url = window.location.href;
+
+        function refresh_page(){
+            window.location = url;
+        }
+
+        function clear_inactive_rooms(){
+            socket.emit("admin_request", ["admin", "lonlonx", sessionStorage.getItem("access"), 'clear-inactive-room']);
+        }
+
+        function init_access_key(){
+            socket.emit("verify_access_key", ["admin", "lonlonx", $("#inp_key").val()]); 
+        }
+
+        function card_display_template(name, player, status){
+            let str="";
+            //str += "<div class='row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mb-4'>";
+				str += "<div class='col'>";
+					str += "<div class='card shadow-sm'>";
+						str += "<div class='card-body'>";
+						str += "<p class='card-text'>"+name+"</p>";
+						str += "<div class='d-flex justify-content-between align-items-center'>";
+							str += "<small class='text-body-secondary'>Player "+player+"</small>";
+							str += "<small class='text-body-secondary'>"+status+"</small>";
+						str += "</div>";
+						str += "</div>";
+					str += "</div>";
+				str += "</div>";
+			//str += "</div>";
+
+            return str;
+        }
+
+        function process_statics_data(ind, data, t_stamp){
+            let rooms = "";
+            let total_rooms = 0;
+            let total_players = 0;
+
+            for(j=0; j<ind.length; j++){
+                total_rooms++;
+                total_players += data[ind[j]]['players'];
+                rooms += "<div class='room_list_item d-flex justify-content-between' room_id='"+ind[j]+"'>";
+                rooms += "<div class=''>"+ind[j]+"</div>";
+                rooms += "<div class=''>"+data[ind[j]]['players']+"</div>";
+                rooms += "</div>"
+            }
+
+            $("#room_list").html(rooms);
+            $("#player_onl").html(total_players);
+
+            $(".room_list_item").on("click", function(){
+                $(".room_list_item").css("background-color", "transparent");
+                //$(this).css("background-color", "rgb(254, 181, 181)");
+                $(this).css("background-color", "rgb(193, 252, 215)");
+                let str = "";
+                let room_arr = data[$(this).attr("room_id")]
+                
+                if(room_arr['players'] == 0){
+                    str += "No active players."
+                }
+                else{
+                    let room_ind = $(this).attr("room_id")
+                    let time_lapse = t_stamp - data[room_ind]['stamp'];
+                    let room_status = "<span class='badge text-bg-success rounded-pill'>Active</span>";
+                    if(time_lapse > data[room_ind]['t_limit'])
+                        room_status = "<span class='badge text-bg-danger rounded-pill'>Expired</span>";
+
+                    str += "<div class='d-flex justify-content-between pb-2'>";
+                    str += "<div><strong>"+data[room_ind]['title']+"</strong><small>&ensp;&ensp;<i>( "+data[room_ind]['min_players']+" minimum players )</i></small></div>";
+                    str += "<small>"+room_status+"</small>";
+                    str += "</div>";
+                    str += "<div class='row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mb-4'>";
+                    for(i=1; i<=room_arr['players']; i++){
+                        try{
+                            str += card_display_template(room_arr[i]['name'], room_arr[i]['pid'], room_arr[i]['status'])
+                        }catch(e){}
+                    }
+                    str += "</div>";
+                }
+                    
+                $("#player_list").html(str);
+            });
+        }
+
+        socket.on('access_verification_result', function(data) {
+            if(data){
+                sessionStorage.setItem("access", data)
+                socket.emit("server_data", ["get", "", "", "", "admin"]);
+            }
+        });
+
+        socket.on('admin_request_complete', function(data) {
+            window.location = url;
+        });
+        
+        socket.on('rooms_data', function(data) {
+            let str = "";
+            let ind = Object.keys(data[0]);
+            if(ind.length != 0){
+                process_statics_data(ind, data[0], data[1])
+            }
+            else{
+                $("#room_list").html("No active rooms.");
+            }
+            $("#modalEnterName").addClass('fade d-none');
+        });
+
+        window.onload = function(){
+			if(sessionStorage.getItem("access") != undefined){
+                socket.emit("server_data", ["get", "", "", "", "admin"]);
+			}
+        }
+        
+	</script>
+</html>

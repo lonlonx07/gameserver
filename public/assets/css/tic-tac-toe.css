@@ -1,0 +1,58 @@
+		.player-ava {
+			width: 150px;
+			height: 150px;
+			padding: 5px;
+		}
+
+		.player-name {
+			font-weight: 600;
+			width: 100%;
+			padding: 3px;
+		}
+
+		#game_board {
+			display: grid;
+			grid-template-columns: auto auto auto;
+			width: 300px;
+			height: 300px;
+			margin: auto;
+			
+		}
+
+		#game_board > div {
+			background-color: #f1f1f1;
+			border: 1px solid black;
+			font-size: 30px;
+			text-align: center;
+			width: 100px;
+			height: 100px;
+		}
+
+		#p1_indc, #p2_indc {
+			border-radius: 25px;
+			width: 25px;
+			height: 25px;
+			background-color: red;
+			background-image: radial-gradient(red, rgb(234, 184, 184), gray);
+		}
+
+		#room_id_dsp {
+			/*background-color: #ffffff;*/
+			margin-left: 5px;
+			margin-right: 5px;
+		}
+		
+		.blinker {
+			animation: turn_indc 2s infinite;
+		}
+
+		@keyframes turn_indc {
+			from {
+				background-color: gray;
+				background-image: radial-gradient(white, gray)
+			}
+			to {
+				background-color: rgb(14, 194, 14);
+				background-image: radial-gradient(rgb(14, 194, 14), rgb(133, 237, 133), gray)
+			}
+		}

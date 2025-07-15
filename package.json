@@ -1,0 +1,26 @@
+{
+  "name": "pvp-server",
+  "version": "1.0.0",
+  "description": "Soket IO Nodejs Game Server with Express framework",
+  "main": "app.js",
+  "scripts": {
+    "test": "node --test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lonlonx07/gameserver.git"
+  },
+  "keywords": [
+    "gameserver"
+  ],
+  "author": "lonlonx",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lonlonx07/gameserver/issues"
+  },
+  "homepage": "https://github.com/lonlonx07/gameserver#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "socket.io": "^4.8.1"
+  }
+}

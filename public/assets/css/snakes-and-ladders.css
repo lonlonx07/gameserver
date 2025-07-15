@@ -1,0 +1,159 @@
+.player-ava {
+	width: 150px;
+	height: 150px;
+	padding: 5px;
+}
+
+.player-name {
+	font-weight: 600;
+	width: 100%;
+	padding: 3px;
+}
+
+#p1_indc, #p2_indc, #p3_indc, #p4_indc {
+	border-radius: 25px;
+	width: 25px;
+	height: 25px;
+	background-color: red;
+	background-image: radial-gradient(red, rgb(234, 184, 184), gray);
+}
+
+.blinker {
+	animation: turn_indc 2s infinite;
+}
+
+@keyframes turn_indc {
+	from {
+		background-color: gray;
+		background-image: radial-gradient(white, gray)
+	}
+	to {
+		background-color: rgb(14, 194, 14);
+		background-image: radial-gradient(rgb(14, 194, 14), rgb(133, 237, 133), gray)
+	}
+}
+
+#grid {
+	font-family: arial, sans-serif;
+	border-collapse: collapse;
+	width: 300px;
+	height: 300px;
+	margin-left: auto;
+	margin-right: auto;
+}
+		
+#game_stat {
+	width: 100%;
+	border-collapse: collapse;
+}
+			
+.game_board td, .game_board th {
+	border: 1px solid #dddddd;
+	text-align: center;
+	width: 100px;
+	height: 100px;
+	border-color: #000;
+}
+		
+.game_stat td, .game_stat th {
+	border: 1px solid #dddddd;
+	text-align: center;
+	padding: -20px;
+	width: 20px;
+	height: 20px;
+	border-color: #000;
+	padding: 10px;
+}
+		
+#home {
+	margin-top: 10%;
+	text-align: center;
+}
+		
+#board, #intro {
+	width: 100%;
+	margin-top: 8%;
+	text-align: center;
+}
+		
+#room_id {
+	width: 200px;
+	border: dotted 1px;
+	padding: 2px 5px 2px 5px;
+}
+		
+#winner_indc {
+	font-size: 30px;
+	color: red;
+	width: 100%;
+	text-align: center;
+}
+		
+.navi_button {
+	width:200px;
+}
+		
+.create {
+	height:50px;
+}
+
+		#game_board {
+			display: grid;
+			grid-template-columns: auto auto auto auto auto auto auto auto auto auto;
+			width: 450px;
+			height: 450px;
+			margin: auto;
+			
+		}
+
+		#game_board > div {
+			background-color: #f1f1f1;
+			/*border: 1px solid black;*/
+			font-size: 30px;
+			text-align: center;
+			width: 45px;
+			height: 45px;
+		}
+
+		.board-piece {
+			width: 45px;
+			height: 45px;
+		}
+
+		.board-piece-active {
+			animation: glow 1s ease-in-out infinite alternate;
+		}
+
+		.dsp-game-event {
+			background-color: blue;
+		}
+
+		@keyframes glow {
+			from {
+				border: 3px solid rgb(227, 42, 255);
+			}
+			
+			to {
+				border: 3px solid rgb(165, 207, 37);
+			}
+		}
+		
+		#act_ind {
+			width: 100%;
+			text-align: center;
+			font-weight: 400;
+			animation: fade_anim 2s infinite;
+		}
+
+		@keyframes fade_anim {
+			from {
+				color: rgb(0, 0, 0);
+			}
+			to {
+				color: rgb(255, 255, 255);
+			}
+		}
+
+		.button-mode {
+			cursor: pointer;
+		}
