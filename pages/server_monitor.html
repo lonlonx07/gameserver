@@ -17,23 +17,24 @@
 	</style>
 	
 	<body>
-            <div class="modal modal-sheet position-absolute d-block bg-body-secondary p-4 py-md-5" tabindex="-1" role="dialog" id="modalEnterName">
-				<div class="modal-dialog" role="document">
-					<div class="modal-content rounded-4 shadow">
-						<div class="modal-header p-5 pb-4 border-bottom-0 align-items-center">
-							<h1 class="fw-bold mb-0 fs-2">Enter your access key</h1>
-						</div>
-						<div class="modal-body p-5 pt-0">
-							<div class="form-floating mb-3">
-								<input type="password" class="form-control rounded-3" id="inp_key" placeholder="">
-								<label for="inp_name">Key Code</label>
-							</div>
-							<button class="w-100 mb-2 btn btn-lg rounded-3 btn-primary" onclick="init_access_key()">Enter</button>
-						</div>
-					</div>
-				</div>
-			</div>
-        <div id="server_stats">
+        <div id="auth_portal" class="modal modal-sheet position-absolute d-block bg-body-secondary p-4 py-md-5 d-none" tabindex="-1" role="dialog" id="modalEnterName">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content rounded-4 shadow">
+                    <div class="modal-header p-5 pb-4 border-bottom-0 align-items-center">
+                        <h1 class="fw-bold mb-0 fs-2">Enter your access key</h1>
+                    </div>
+                    <div class="modal-body p-5 pt-0">
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control rounded-3" id="inp_key" placeholder="">
+                            <label for="inp_name">Key Code</label>
+                        </div>
+                        <button class="w-100 mb-2 btn btn-lg rounded-3 btn-primary" onclick="init_access_key()">Enter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="server_stats" class="d-none">
             <h2>Server Monitor</h2>
             <table class="table table-bordered">
                 <col width="25%"/>
@@ -47,12 +48,13 @@
                     <td id="player_list"></td>
                 </tr>
             </table>
-        </div>
-        <div class="d-flex justify-content-between position-fixed bottom-0 end-0 w-100">
-            
-                <button class="btn btn-success m-3" onclick="refresh_page()">REFRESH</button>
-                <button class="btn btn-danger m-3" onclick="clear_inactive_rooms()">DELETE INACTIVE ROOMS</button>
-            
+        
+            <div class="d-flex justify-content-between position-fixed bottom-0 end-0 w-100">
+                
+                    <button class="btn btn-success m-3" onclick="refresh_page()">REFRESH</button>
+                    <button class="btn btn-danger m-3" onclick="clear_inactive_rooms()">DELETE INACTIVE ROOMS</button>
+                
+            </div>
         </div>
 	</body>
 
@@ -132,10 +134,12 @@
                     str += "<small>"+room_status+"</small>";
                     str += "</div>";
                     str += "<div class='row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mb-4'>";
-                    for(i=1; i<=room_arr['players']; i++){
+                    
+                    for(i=1; i<=room_arr['max_players']; i++){
                         try{
-                            str += card_display_template(room_arr[i]['name'], room_arr[i]['pid'], room_arr[i]['status'])
-                        }catch(e){}
+                            if(room_arr[i]['status'] == "active")
+                                str += card_display_template(room_arr[i]['name'], room_arr[i]['pid'], room_arr[i]['status'])
+                        }catch(e){break;}
                     }
                     str += "</div>";
                 }
@@ -146,6 +150,8 @@
 
         socket.on('access_verification_result', function(data) {
             if(data){
+                $("#auth_portal").addClass("d-none");
+                $("#server_stats").removeClass("d-none");
                 sessionStorage.setItem("access", data)
                 socket.emit("server_data", ["get", "", "", "", "admin"]);
             }
@@ -169,8 +175,12 @@
 
         window.onload = function(){
 			if(sessionStorage.getItem("access") != undefined){
+                $("#server_stats").removeClass("d-none");
                 socket.emit("server_data", ["get", "", "", "", "admin"]);
 			}
+            else{
+                $("#auth_portal").removeClass("d-none");
+            }
         }
         
 	</script>

@@ -15,7 +15,7 @@
                     </span>
                 </div>
                 <div class="menu col-6 text-center">
-                    ROOM ID:
+                    <strong>ENTER ROOM ID</strong>
                     <br/>
                     <input id="room_id" class="inp">
                     <br/><br/>
@@ -50,8 +50,10 @@
         let room_data = {};
         let player_turn = false;
         let ind_arr;
+        let game_id = "";
         let room_index = [
             ["title","GAME TITLE"], 
+            ["game_id","game-id"],
             ["id","room_id"], 
             ["max_players",4],
             ["min_players",2],
@@ -67,6 +69,10 @@
             ["piece","string"],
             ["score","int"]
         ];
+
+        socket.on('player_data', function(data) {
+            
+        });
 
         socket.on('room_data', function(data) {
             let str = "";

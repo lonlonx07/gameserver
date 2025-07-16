@@ -35,6 +35,11 @@ io.on('connection', (socket) => {
         let res = mod_data.verify_access_key(data);
         io.to(socket.id).emit("access_verification_result", res);
 	});
+
+    socket.on('room_list', data => {
+        let res = mod_data.get_room_list(data);
+        io.to(socket.id).emit("return_room_list", res);
+	});
     
     socket.on('create_room', data => {
         let room_id = mod_data.room_generator(data[1]);
@@ -69,7 +74,7 @@ io.on('connection', (socket) => {
         if(chk_res){
             socket.join(room_id);
             res = mod_data.set_data(data);    
-            io.to(room_id).emit("room_data", res);
+            //io.to(room_id).emit("room_data", res);
         }
         else{
             io.to(socket.id).emit("room_data", "room-error");
@@ -87,7 +92,13 @@ io.on('connection', (socket) => {
             else if(data[0] == "set"){
                 res = mod_data.set_data(data);
             }
-            io.to(room_id).emit("room_data", res);
+            if(data[4] == "*"){
+                io.to(room_id).emit("room_data", res);
+            }
+            else{
+                io.to(room_id).emit("player_data", res);
+            }
+            
         }
         else{
             io.to(socket.id).emit("room_data", "room-error");

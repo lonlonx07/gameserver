@@ -191,6 +191,18 @@ function mthd_manage_room_data(data){
     return "complete";
 }
 
+function mthd_get_room_list(data){
+    let ret = [];
+    let obj = Object.keys(players);
+    for(let i=0; i<obj.length; i++){
+        if(data == players[obj[i]]['game_id'] && players[obj[i]]['players'] < players[obj[i]]['max_players'])
+            ret.push({'id':players[obj[i]]['id'], 'creator':players[obj[i]][1]['name']})
+    }
+
+    return ret;
+}
+
+module.exports.get_room_list = mthd_get_room_list;
 module.exports.manage_room_data = mthd_manage_room_data;
 module.exports.check_room = mthd_check_room;
 module.exports.verify_access_key = mthd_verify_access_key;
