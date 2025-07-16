@@ -45,6 +45,11 @@ function join_room(){
     }
 }
 
+function join_from_list(id){
+    $("#room_id").val(id);
+    join_room();
+}
+
 function get_session(strg){
     let session = sessionStorage.getItem(strg);
     let game_session = []
@@ -75,9 +80,22 @@ function format_session(data){
 }
 
 socket.on('set_cookie', function(data) {
-    console.log(data)
     if(errors[data] == undefined){
         format_session(data);
         window.location = url;
     }
+    else{
+        alert(errors[data]);
+    }
+});
+
+socket.on('return_room_list', function(data) {
+    let str = "";
+    for(i=0; i<data.length; i++){
+        str +="<div class='d-flex justify-content-between w-100 p-1 mb-1' style='border: solid 1px; text-align:left;'>";
+        str +="<label>id: "+data[i]['id']+"</label>creator: "+data[i]['creator'];
+        str +="<a id='p1_pass_turn' class='btn btn-sm btn-outline-secondary' onclick='join_from_list(\""+data[i]['id']+"\")'>JOIN</a>";
+        str +="</div>";
+    }
+    $("#room_list").html(str);
 });
