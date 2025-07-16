@@ -353,8 +353,8 @@
             else{
                 ind_arr = get_session("session");
                 if(ind_arr.length == 0){
-                    init_game('portal');
                     socket.emit("room_list", game_id);
+                    init_game('portal');
                 }
                 else{
                     socket.emit("rejoin_room", ["set", "resume", ind_arr[0], ind_arr[1]], "*");
