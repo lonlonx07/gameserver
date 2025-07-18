@@ -23,7 +23,7 @@
                             <div class="mb-5 fs-2">JOIN EXISTING ROOM</div>
                             <strong>ENTER ROOM ID</strong>
                             <br/>
-                            <input id="room_id" class="inp" placeholder="enter room id">
+                            <input id="room_id" class="inp" placeholder="enter room id" onkeyup="join_room()">
                             <br/><br/>
                             <button id="btn_join" class="btn btn-primary" onclick="join_room()">JOIN</button>
                        </div>
@@ -62,6 +62,7 @@
                                     </div>
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div class="btn-group">
+                                            <small id="p1_status"></small>
                                         <!--a id="p1_pass_turn" class="btn btn-sm btn-outline-secondary d-none" onclick="">PASS</a-->
                                         </div>
                                         <div class="indc" id="p1_indc"></div>
@@ -92,6 +93,7 @@
                                     </div>	
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div class="btn-group">
+                                            <small id="p2_status"></small>
                                         <!--a id="p2_pass_turn" class="btn btn-sm btn-outline-secondary d-none" onclick="">PASS</a-->
                                         </div>
                                         <div class="indc" id="p2_indc"></div>
@@ -393,18 +395,32 @@
             }
         }
 
-        socket.on('player_data', function(data) {
+        socket.on('player_data', function(server_data) {
             
         });
 
-        socket.on('room_data', function(data) {
+        socket.on('room_data', function(server_data) {
             let str = "";
+            let data = server_data[0];
+            let room_event = server_data[1];
+            let p_ind = server_data[2];
             if(data == "room-error"){
                 alert("Room error problem occured. [Room doesn't exist]");
             }
             else{
                 let obj = Object.keys(data);
                 $("#room_id_dsp").html(data['id']);
+                room_data = data;
+
+                if(room_event == "suspend" || room_event == "resume"){
+                    if(room_event == "resume"){
+                        $("#p"+p_ind+"_status").html("");
+                    }
+                    else{
+                        $("#p"+p_ind+"_status").html("offline");
+                    }
+                }
+                else{
                 try{
                     player_piece = data[ind_arr[1]]['piece'];
                 } catch(e){}
@@ -414,9 +430,14 @@
                         $("#p"+obj[i-1]+"_img").attr("src", img_dir+data[obj[i-1]]['piece']+".png");
                         $("#p"+obj[i-1]+"_name").html(data[obj[i-1]]['name']);
                         $("#p"+obj[i-1]+"_sco").html(data[obj[i-1]]['score']);
+
+                        if(data[obj[i-1]]['status'] == "suspended")
+                            $("#p"+obj[i-1]+"_status").html("offline");
+                        else
+                            $("#p"+obj[i-1]+"_status").html("");
+
                     }catch(e){}
                 }
-                room_data = data;
                 
                 if(data['board'] != undefined){
                 
@@ -481,9 +502,11 @@
                         
                         
                         for(i=0; i<room_data['flip'].length; i++){
-                            $("#board_piece"+room_data['flip'][i]).addClass('flip-anim');
+                            if(room_event != "piece")
+                                $("#board_piece"+room_data['flip'][i]).addClass('flip-anim');
                         }
                     }                    
+                }
                 }
             }
         });

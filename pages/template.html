@@ -17,7 +17,7 @@
                 <div class="menu col-6 text-center">
                     <strong>ENTER ROOM ID</strong>
                     <br/>
-                    <input id="room_id" class="inp">
+                    <input id="room_id" class="inp" onkeyup="join_room()">
                     <br/><br/>
                     <button id="btn_join" class="btn btn-primary" onclick="join_room()">JOIN</button>
                 </div>
@@ -70,12 +70,13 @@
             ["score","int"]
         ];
 
-        socket.on('player_data', function(data) {
+        socket.on('player_data', function(server_data) {
             
         });
 
-        socket.on('room_data', function(data) {
+        socket.on('room_data', function(server_data) {
             let str = "";
+            let data = server_data[0];
             if(data == "room-error"){
                 alert("Room error problem occured. [Room doesn't exist]");
             }

@@ -74,10 +74,10 @@ io.on('connection', (socket) => {
         if(chk_res){
             socket.join(room_id);
             res = mod_data.set_data(data);    
-            //io.to(room_id).emit("room_data", res);
+            //io.to(room_id).emit("room_data", [res, data[1], data[3]]);
         }
         else{
-            io.to(socket.id).emit("room_data", "room-error");
+            io.to(socket.id).emit("room_data", ["room-error", data[1], data[3]]);
         }
     });
 
@@ -92,16 +92,17 @@ io.on('connection', (socket) => {
             else if(data[0] == "set"){
                 res = mod_data.set_data(data);
             }
-            if(data[4] == "*"){
-                io.to(room_id).emit("room_data", res);
+
+            if(data[1] == "target"){
+                io.to(room_id).emit("player_data", [res, data[1], data[3]]);
             }
             else{
-                io.to(room_id).emit("player_data", res);
+                io.to(room_id).emit("room_data", [res, data[1], data[3]]);
             }
             
         }
         else{
-            io.to(socket.id).emit("room_data", "room-error");
+            io.to(socket.id).emit("room_data", ["room-error", data[1], data[3]]);
         }
 	});
 

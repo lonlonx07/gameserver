@@ -19,7 +19,11 @@
 	<body>
         <div id="auth_portal" class="modal modal-sheet position-absolute d-block bg-body-secondary p-4 py-md-5 d-none" tabindex="-1" role="dialog" id="modalEnterName">
             <div class="modal-dialog" role="document">
+                <div id="action_notify" class="alert alert-danger text-center fade" role="alert">
+                    Invalid access key! 
+                </div>
                 <div class="modal-content rounded-4 shadow">
+                    
                     <div class="modal-header p-5 pb-4 border-bottom-0 align-items-center">
                         <h1 class="fw-bold mb-0 fs-2">Enter your access key</h1>
                     </div>
@@ -63,6 +67,12 @@
 	<script>
 		let socket = io();
         const url = window.location.href;
+
+        $("#inp_key").keyup(function(event){
+			if(event.which == 13){
+				init_access_key();
+			}
+		})
 
         function refresh_page(){
             window.location = url;
@@ -154,6 +164,12 @@
                 $("#server_stats").removeClass("d-none");
                 sessionStorage.setItem("access", data)
                 socket.emit("server_data", ["get", "", "", "", "admin"]);
+            }
+            else{
+                $("#action_notify").addClass("show");
+                setTimeout(function(){
+                    $("#action_notify").removeClass("show");
+                }, 2000);
             }
         });
 

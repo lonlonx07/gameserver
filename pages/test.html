@@ -292,12 +292,17 @@
             }
         });
 
-        socket.on('room_data', function(data) {
+        socket.on('player_data', function(server_data) {
+            
+        });
+
+        socket.on('room_data', function(server_data) {
             let str = "";
-            if(data == "room-error"){
+            if(server_data == "room-error"){
                 alert("Room error problem occured. [Room doesn't exist]");
             }
             else{
+                data = server_data[0]
                 let obj = Object.keys(data);
                 str = "ROOM ID: "+data['id']+"  Current Players: "+data['players']+"\n";
                 for(i=1; i<=obj.length; i++){

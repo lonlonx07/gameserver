@@ -23,7 +23,7 @@
                             <div class="mb-5 fs-2">JOIN EXISTING ROOM</div>
                             <strong>ENTER ROOM ID</strong>
                             <br/>
-                            <input id="room_id" class="inp" placeholder="enter room id">
+                            <input id="room_id" class="inp" placeholder="enter room id" onkeyup="join_room()">
                             <br/><br/>
                             <button id="btn_join" class="btn btn-primary" onclick="join_room()">JOIN</button>
                        </div>
@@ -61,6 +61,7 @@
                                     </div>
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div class="btn-group">
+                                            <small id="p1_status"></small>
                                         <!--a id="p1_pass_turn" class="btn btn-sm btn-outline-secondary d-none" onclick="">PASS</a-->
                                         </div>
                                         <div class="indc" id="p1_indc"></div>
@@ -76,6 +77,7 @@
                                     </div>
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div class="btn-group">
+                                            <small id="p3_status"></small>
                                         <!--a id="p3_pass_turn" class="btn btn-sm btn-outline-secondary d-none" onclick="">PASS</a-->
                                         </div>
                                         <div class="indc" id="p3_indc"></div>
@@ -120,6 +122,7 @@
                                     </div>
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div class="btn-group">
+                                            <small id="p2_status"></small>
                                         <!--a id="p2_pass_turn" class="btn btn-sm btn-outline-secondary d-none" onclick="">PASS</a-->
                                         </div>
                                         <div class="indc" id="p2_indc"></div>
@@ -135,6 +138,7 @@
                                     </div>
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div class="btn-group">
+                                            <small id="p4_status"></small>
                                         <!--a id="p4_pass_turn" class="btn btn-sm btn-outline-secondary d-none" onclick="">PASS</a-->
                                         </div>
                                         <div class="indc" id="p4_indc"></div>
@@ -156,7 +160,7 @@
         let img_dir = "../images/snakes-and-ladders/";
         let player_piece = "";
         let room_data = {};
-        let player_turn = false;
+        let player_turn = 0;
         let ind_arr;
         let game_id = "snakes-and-ladders";
         let room_index = [
@@ -167,11 +171,15 @@
             ["min_players",2],
             ["t_limit",3600], 
             ["turn","int"],
+            ["next_turn","int"],
             ["winner","int"],
             ["status", ""],
             ["dice_rnd",1],
             ["dice_rot",90],
-            ["dice_stat","static"]
+            ["dice_stat","static"],
+            ["ext_move","int"],
+            ["moves","array"],
+            ["target_char","int"]
         ];
         let player_index = [
             ["pid","player_ind"], 
@@ -181,7 +189,9 @@
             ["score","int"],
             ["block","int"]
         ];
+        
         let draw_timer;
+        let move_timer;
         let board_index = [10,9,8,7,6,5,4,3,2,1,
 		11,12,13,14,15,16,17,18,19,20,
 		30,29,28,27,26,25,24,23,22,21,
@@ -192,48 +202,41 @@
 		71,72,73,74,75,76,77,78,79,80,
 		90,89,88,87,86,85,84,83,82,81,
 		91,92,93,94,95,96,97,98,99,100]
+        let ladder = []
+		ladder[1] = 38;
+		ladder[4] = 14;
+		ladder[9] = 31;
+		ladder[21] = 42;
+		ladder[28] = 84;
+		ladder[51] = 67;
+		ladder[72] = 91;
+		ladder[80] = 99;
+		let snake = []
+		snake[17] = 7;
+		snake[54] = 34;
+		snake[62] = 19;
+		snake[64] = 60;
+		snake[87] = 36;
+		snake[93] = 73;
+		snake[95] = 75;
+		snake[98] = 79;
 
+        let active_players = []
         function start_game(){
             room_data['status'] = "begin";
             room_data['winner'] = 0;
+            room_data['winner'] = 0;
             room_data['turn'] = parseInt(ind_arr[1]);
+            for(i=0; i<active_players.length; i++){
+                room_data[active_players[i]]['block'] = 0;
+            }
+            $("#game_msg").html("");
             socket.emit("command", ["set", "update", ind_arr[0], "", "*", room_data]);
         }
 
-        let active_players = []
-        function check_next_turn(){
-            if(pd_roll){
-                for(i=0; i<active_players.length; i++){
-                    if(active_players[i] == room_data['turn']){
-                        room_data['turn'] = active_players[i+1];
-                        console.log(room_data['turn'], "<<");
-                        if(room_data['turn'] == undefined)
-                            room_data['turn'] = 1;
-                        break;
-                    }
-                }
-                pd_roll = false;
-            }
-           
-            
-            /*if(room_data['turn'] == 1){
-                room_data['turn'] = 2;
-            }
-            else if(room_data['turn'] == 2){
-                room_data['turn'] = 1;
-            }*/
-
-            room_data['dice_stat'] = "static";
-            socket.emit("command", ["set", "update", ind_arr[0], "", "*", room_data]);
-        }
-
-        function move_piece(){
-            $(".board-cell").html("");
-            let tmp_ava = img_dir+"ava-"+room_data['turn']+".png";
-            $("#g_"+board_index[room_data[room_data['turn']]['block']-1]).html("<img class='board-piece' src='"+tmp_ava+"'>");
-            
-            if(player_turn)
-                check_next_turn();
+        function display_winner(){
+            $("#game_msg").html(room_data[room_data['winner']]['name'] + " Win!");
+            $("#btn_play").removeClass('d-none');
         }
 
         function dsp_dice_result(){
@@ -249,24 +252,124 @@
 			$("#dice_static").attr('src', '../images/snakes-and-ladders/dice_'+rnd+'.png');
         }
 
+        let move_ind_ctr=0;
+        function move_char(){
+            $(".board-cell").html("");
+            let tmp_ava;
+            for(i=0; i<active_players.length; i++){
+                if(room_data['turn'] != active_players[i]){
+                    tmp_ava = img_dir+"ava-"+active_players[i]+".png";
+                    $("#g_"+board_index[room_data[active_players[i]]['block']-1]).html("<img class='board-piece' src='"+tmp_ava+"'>");
+                }
+                else{
+                    tmp_ava = img_dir+"ava-"+room_data['target_char']+".png";
+                    $("#g_"+board_index[room_data['moves'][move_ind_ctr]-1]).html("<img class='board-piece' src='"+tmp_ava+"'>");
+                }
+            }
+            if(move_ind_ctr == room_data['moves'].length-1){
+                clearInterval(move_timer);
+                room_data[room_data['target_char']]['block'] = room_data['moves'][move_ind_ctr];
+                if(room_data['moves'][move_ind_ctr] == 100){
+                    //$("#game_msg").html(room_data[room_data['target_char']]['name'] + "Winner!")
+                    room_data['winner'] = room_data['target_char'];
+                    display_winner();
+                    room_data['status'] = "end";
+                }
+                else{
+                    $("#game_msg").html("");
+                    $(".indc").removeClass("blinker");
+                    $("#p"+room_data['next_turn']+"_indc").addClass("blinker");
+
+                    if(parseInt(ind_arr[1]) == room_data['next_turn']){
+                        player_turn = parseInt(ind_arr[1]);
+                        $("#act_ind").html("TAP HERE");
+                    }
+                    else{
+                        player_turn = 0;
+                        $("#act_ind").html("&nbsp;");
+                    }
+
+                    room_data['turn'] = room_data['next_turn'];
+                }
+
+                room_data['dice_stat'] = "static";
+                socket.emit("command", ["set", "target", ind_arr[0], "", "*", room_data]);
+            }
+            else{
+                if(ladder[room_data['moves'][move_ind_ctr]] != undefined && move_ind_ctr == room_data['moves'].length-1){
+                    $("#game_msg").html("Yeah!");
+                }
+                else if(snake[room_data['moves'][move_ind_ctr]] != undefined && move_ind_ctr == room_data['moves'].length-1){
+                    $("#game_msg").html("Oh no!");
+                }
+                else{
+                    $("#game_msg").html("Proceed to block "+room_data['moves'][room_data['moves'].length-1]);
+                }
+                move_ind_ctr++;
+            }
+        }
+
         function draw_stop(){
+            //$("#game_msg").html(room_data[room_data['turn']]['name']+" proceed to block "+room_data[room_data['turn']]['block']);
             $("#dice_static").removeClass('d-none');
             $("#dice_anim").addClass('d-none');
             $("#dice_static").removeClass('d-none');
             
             clearInterval(draw_timer);
             dsp_dice_result();
-            move_piece();
+            move_timer = setInterval(move_char, 1000);
         }
 
         let pd_roll = false;
         function init_draw_dice(){
-            if(player_turn && room_data['status'] == "begin"){
+            if(player_turn == parseInt(ind_arr[1]) && room_data['status'] == "begin"){
                 pd_roll = true;
                 let rnd = get_random_num(6);
                 let rot = get_random_num(180);
 
-                room_data[parseInt(ind_arr[1])]['block'] += rnd;
+                
+                room_data['moves'] = [];
+                room_data['target_char'] = parseInt(ind_arr[1]);
+                let tmp_move_cnt = room_data[parseInt(ind_arr[1])]['block'];
+                let add_n = 1;
+                for(i=1; i<=rnd; i++){
+                    tmp_move_cnt+=add_n;
+                    room_data['moves'].push(tmp_move_cnt);
+                    if(tmp_move_cnt == 100)
+                        add_n = -1;
+                }
+
+                if(ladder[tmp_move_cnt] != undefined){
+                    room_data['moves'].push(ladder[tmp_move_cnt]);
+                }
+                else if(snake[tmp_move_cnt] != undefined){
+                    room_data['moves'].push(snake[tmp_move_cnt]);
+                }
+
+                /*room_data[parseInt(ind_arr[1])]['block'] += rnd;
+                let tmp_ind = room_data[parseInt(ind_arr[1])]['block'];
+                if(ladder[tmp_ind] != undefined){
+                    room_data['ext_move'] = ladder[tmp_ind];
+                }
+                else if(snake[tmp_ind] != undefined){
+                    room_data['ext_move'] = snake[tmp_ind];
+                }
+
+                if(room_data[parseInt(ind_arr[1])]['block'] > 100)
+                    room_data[parseInt(ind_arr[1])]['block'] = 100 - (room_data[parseInt(ind_arr[1])]['block'] - 100);*/
+
+                let tmp_next_turn;     
+                for(i=0; i<active_players.length; i++){
+                    if(active_players[i] == player_turn){
+                        tmp_next_turn = active_players[i+1];   
+                        break;
+                    }
+                }
+                if(tmp_next_turn == undefined){
+                    tmp_next_turn = 1;
+                }
+                room_data['next_turn'] = tmp_next_turn;
+
                 room_data['dice_rnd'] = rnd;
                 room_data['dice_rot'] = rot;
                 room_data['dice_stat'] = "draw";
@@ -275,6 +378,7 @@
         }
 
         function on_draw_dice(){
+            move_ind_ctr = 0;
             $("#dice_anim").removeClass('d-none');
             $("#dice_static").addClass('d-none');
             $("#act_ind").html("&nbsp;");
@@ -311,13 +415,16 @@
 			
 		}
 
-        socket.on('player_data', function(data) {
+        socket.on('player_data', function(server_data) {
             
         }); 
 
-        socket.on('room_data', function(data) {
+        socket.on('room_data', function(server_data) {
             let str = "";
             active_players = []
+            let data = server_data[0];
+            let room_event = server_data[1];
+            let p_ind = server_data[2];
             if(data == "room-error"){
                 alert("Room error problem occured. [Room doesn't exist]");
             }
@@ -325,7 +432,16 @@
                 let obj = Object.keys(data);
                 $("#game").removeClass("d-none");
                 $("#room_id_dsp").html(data['id']);
-
+                room_data = data;
+                if(room_event == "suspend" || room_event == "resume"){
+                    if(room_event == "resume"){
+                        $("#p"+p_ind+"_status").html("");
+                    }
+                    else{
+                        $("#p"+p_ind+"_status").html("offline");
+                    }
+                }
+                else{
                 for(i=1; i<=obj.length; i++){
                     try{
                         if(data['dice_stat'] == "static"){
@@ -333,9 +449,14 @@
                             $("#g_"+board_index[data[i]['block']-1]).html("<img class='board-piece' src='"+tmp_ava+"'>");
                         }
 
+                        if(data[i]['block'] == 100)
+                            display_winner(i);
+
+                        
                         if(data[i]['status'] != "active"){
-                            $("#p"+i+"_name").html("???");
-                            $("#p"+i+"_img").attr('src', img_dir+"unknown.png");
+                            $("#p"+i+"_img").attr("src", img_dir+data[i]['char']+".png");
+                            $("#p"+i+"_name").html(data[i]['name']);
+                            $("#p"+i+"_status").html("offline");
                             if(data['status'] == 'begin'){
                                 $("#p"+i+"_ava").addClass("d-none");
                             }
@@ -347,7 +468,8 @@
                             active_players.push(data[i]['pid']);
                             $("#p"+i+"_name").html(data[i]['name']);
                             $("#p"+i+"_img").attr('src', img_dir+"ava-"+data[i]['pid']+".png");
-                            $("#p"+i+"_block").html(data[i]['block']);
+                            $("#p"+i+"_status").html("");
+                            //$("#p"+i+"_block").html(data[i]['block']);
 
                             if(data['status'] == 'begin'){
                                 if(data['winner'] == ""){
@@ -366,14 +488,15 @@
                             $("#player"+i).addClass("d-none");
                     }
                 }
-                room_data = data;
+                
                 
                 if(parseInt(ind_arr[1]) == data['turn']){
-                    player_turn = true;
+                    player_turn = data['turn'];
                     $("#act_ind").html("TAP HERE");
                 }
                 else{
-                    player_turn = false;
+                    player_turn = 0;
+                    $("#act_ind").html("&nbsp;");
                 }
                 
                 if(data['status'] != "begin" && data['players'] >= data['min_players']){
@@ -388,6 +511,7 @@
                 }
                 else{
                     dsp_dice_result();
+                }
                 }
             }
         });
@@ -429,6 +553,12 @@
             if(ind_arr.length != 0){
                 socket.emit("command", ["set", "suspend", ind_arr[0], parseInt(ind_arr[1]), "*"]);
             }
+            
+            /*if(ind_arr.length != 0){
+                event.preventDefault();
+                event.returnValue = ''; 
+                socket.emit("command", ["set", "suspend", ind_arr[0], parseInt(ind_arr[1]), "*"]);
+            }*/
         }
 
 	</script>

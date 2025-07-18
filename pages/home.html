@@ -84,6 +84,9 @@
 		<div class="container">
 			<div class="modal modal-sheet position-absolute d-block bg-body-secondary p-4 py-md-5 fade d-none" tabindex="-1" role="dialog" id="modalEnterName">
 				<div class="modal-dialog" role="document">
+					<div id="action_notify" class="alert alert-danger text-center fade" role="alert">
+                    	Invalid name! 
+                	</div>
 					<div class="modal-content rounded-4 shadow">
 						<div class="modal-header p-5 pb-4 border-bottom-0 align-items-center">
 							<h1 class="fw-bold mb-0 fs-2">Enter your name</h1>
@@ -186,6 +189,12 @@
 	<script src="../assets/dist/js/jquery-3.6.3.js"></script>
 	<script src="../assets/js/scripts.js"></script>
 	<script>
+
+		$("#inp_name").keyup(function(event){
+			if(event.which == 13){
+				init_player_name();
+			}
+		})
 		
 		//let w_game = {};
 		function open_game(val){
@@ -206,10 +215,16 @@
 
 		function init_player_name(){
 			let player_name = $("#inp_name").val();
-			if(player_name != ""){
+			if(player_name.trim() != ""){
 				$("#dsp_player_name").html(player_name);
 				$("#modalEnterName").addClass('fade d-none');
 				set_session("user", player_name);
+			}
+			else{
+				$("#action_notify").addClass("show");
+                setTimeout(function(){
+                    $("#action_notify").removeClass("show");
+                }, 2000);
 			}
 		}
 
