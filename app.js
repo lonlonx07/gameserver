@@ -92,9 +92,12 @@ io.on('connection', (socket) => {
             else if(data[0] == "set"){
                 res = mod_data.set_data(data);
             }
-
+            
             if(data[1] == "target"){
                 io.to(room_id).emit("player_data", [res, data[1], data[3]]);
+            }
+            else if(data[1] == "start"){
+                io.to(room_id).emit("player_data", ["", data[1], data[3]]);
             }
             else{
                 io.to(room_id).emit("room_data", [res, data[1], data[3]]);

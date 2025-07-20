@@ -103,80 +103,99 @@
 				</div>
 			</div>
 
-			<div class='d-flex justify-content-between align-items-center'>
-				<h3>PVP GROUNDS</h3>
-				<h5>User: <i><label id="dsp_player_name"></label> | <a onclick="player_sign_out()">Sign Out</a></i></h5>
-			</div>
-			
-			
-			<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mb-4">
-				<div class="col">
-					<div class="card shadow-sm">
-						<svg class="bd-placeholder-img card-img-top text-center" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title>
-							<!--rect width="100%" height="100%" fill="#55595c"/-->
-							<image x="-10%" height="100%" width="120%" href="../images/tic-tac-toe/cover.png" />
-							<!--text x="50%" y="50%" fill="#eceeef" dy=".3em">TIC TAC TOE</text-->
-						</svg>
-						<div class="card-body">
-						<p class="card-text">PVP game.</p>
-						<div class="d-flex justify-content-between align-items-center">
-							<div class="btn-group">
-							<a class="btn btn-sm btn-outline-secondary" onclick="open_game('tic-tac-toe')" target="_blank">PLAY</a>
+			<div id="menu" class="d-none">
+				<div class='d-flex justify-content-between align-items-center'>
+					<h3>PVP GROUNDS</h3>
+					<h5>User: <i><label id="dsp_player_name"></label> | <a onclick="player_sign_out()">Sign Out</a></i></h5>
+				</div>
+				
+				<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mb-4">
+					<div class="col">
+						<div class="card shadow-sm">
+							<svg class="bd-placeholder-img card-img-top text-center" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title>
+								<!--rect width="100%" height="100%" fill="#55595c"/-->
+								<image x="-10%" height="100%" width="120%" href="../images/tic-tac-toe/cover.png" />
+								<!--text x="50%" y="50%" fill="#eceeef" dy=".3em">TIC TAC TOE</text-->
+							</svg>
+							<div class="card-body">
+							<p class="card-text">PVP game.</p>
+							<div class="d-flex justify-content-between align-items-center">
+								<div class="btn-group">
+								<a class="btn btn-sm btn-outline-secondary" onclick="open_game('tic-tac-toe')" target="_blank">PLAY</a>
+								</div>
+								<small class="text-body-secondary">2 Players</small>
 							</div>
-							<small class="text-body-secondary">2 Players</small>
+							</div>
 						</div>
+					</div>
+					<div class="col">
+						<div class="card shadow-sm">
+							<svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title>
+								<!--rect width="100%" height="100%" fill="#55595c"/>
+								<text x="50%" y="50%" fill="#eceeef" dy=".3em">SNAKES & LADDERS</text-->
+								<image x="-10%" height="100%" width="120%" href="../images/snakes-and-ladders/snakesnladders.jpg" />
+							</svg>
+							<div class="card-body">
+							<p class="card-text">Multi player game.</p>
+							<div class="d-flex justify-content-between align-items-center">
+								<div class="btn-group">
+								<a class="btn btn-sm btn-outline-secondary" onclick="open_game('snakes-and-ladders')" target="_blank">PLAY</a>
+								</div>
+								<small class="text-body-secondary">2 - 4 Players</small>
+							</div>
+							</div>
+						</div>
+					</div>
+					<div class="col">
+						<div class="card shadow-sm">
+							<svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title>
+								<!--rect width="100%" height="100%" fill="#55595c"/>
+								<text x="50%" y="50%" fill="#eceeef" dy=".3em">OTHELLO</text-->
+								<image x="-10%" height="100%" width="120%" href="../images/othello/othello.png" />
+							</svg>
+							<div class="card-body">
+							<p class="card-text">PVP game.</p>
+							<div class="d-flex justify-content-between align-items-center">
+								<div class="btn-group">
+								<a class="btn btn-sm btn-outline-secondary" onclick="open_game('othello')" target="_blank">PLAY</a>
+								</div>
+								<small class="text-body-secondary">2 Players</small>
+							</div>
+							</div>
 						</div>
 					</div>
 				</div>
-				<div class="col">
-					<div class="card shadow-sm">
-						<svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title>
-							<!--rect width="100%" height="100%" fill="#55595c"/>
-							<text x="50%" y="50%" fill="#eceeef" dy=".3em">SNAKES & LADDERS</text-->
-							<image x="-10%" height="100%" width="120%" href="../images/snakes-and-ladders/snakesnladders.jpg" />
-						</svg>
-						<div class="card-body">
-						<p class="card-text">Multi player game.</p>
-						<div class="d-flex justify-content-between align-items-center">
-							<div class="btn-group">
-							<a class="btn btn-sm btn-outline-secondary" onclick="open_game('snakes-and-ladders')" target="_blank">PLAY</a>
+				<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mb-4">
+					<div class="col">
+						<div class="card shadow-sm">
+							<svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title>
+								<!--rect width="100%" height="100%" fill="#55595c"/>
+								<text x="50%" y="50%" fill="#eceeef" dy=".3em">SNAKES & LADDERS</text-->
+								<image x="-10%" height="100%" width="120%" href="../images/scrabble/scrabble.jpg" />
+							</svg>
+							<div class="card-body">
+							<p class="card-text">Multi player game.</p>
+							<div class="d-flex justify-content-between align-items-center">
+								<div class="btn-group">
+								<a class="btn btn-sm btn-outline-secondary disabled" onclick="open_game('scrabble')" target="_blank">PLAY</a>
+								</div>
+								<small class="text-body-secondary">2 - 4 Players</small>
 							</div>
-							<small class="text-body-secondary">2 - 4 Players</small>
-						</div>
+							</div>
 						</div>
 					</div>
-				</div>
-				<div class="col">
-					<div class="card shadow-sm">
-						<svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title>
-							<!--rect width="100%" height="100%" fill="#55595c"/>
-							<text x="50%" y="50%" fill="#eceeef" dy=".3em">OTHELLO</text-->
-							<image x="-10%" height="100%" width="120%" href="../images/othello/othello.png" />
-						</svg>
-						<div class="card-body">
-						<p class="card-text">PVP game.</p>
-						<div class="d-flex justify-content-between align-items-center">
-							<div class="btn-group">
-							<a class="btn btn-sm btn-outline-secondary" onclick="open_game('othello')" target="_blank">PLAY</a>
+					<div class="col">
+						<div class="card shadow-sm">
+							<svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em">Test</text></svg>
+							<div class="card-body">
+							<p class="card-text">Test command actions.</p>
+							<div class="d-flex justify-content-between align-items-center">
+								<div class="btn-group">
+								<a class="btn btn-sm btn-outline-secondary" onclick="open_game('test')" target="_blank">PLAY</a>
+								</div>
+								<small class="text-body-secondary">2 Players</small>
 							</div>
-							<small class="text-body-secondary">2 Players</small>
-						</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mb-4">
-				<div class="col">
-					<div class="card shadow-sm">
-						<svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em">Test</text></svg>
-						<div class="card-body">
-						<p class="card-text">Test command actions.</p>
-						<div class="d-flex justify-content-between align-items-center">
-							<div class="btn-group">
-							<a class="btn btn-sm btn-outline-secondary" onclick="open_game('test')" target="_blank">PLAY</a>
 							</div>
-							<small class="text-body-secondary">2 Players</small>
-						</div>
 						</div>
 					</div>
 				</div>
@@ -196,16 +215,8 @@
 			}
 		})
 		
-		//let w_game = {};
 		function open_game(val){
-			/*if(w_game[val] == undefined || w_game[val].opener == null){
-				w_game[val] = window.open(url+"game/"+val, val);
-			}
-			else{
-				alert("Game is currently active.");
-			}*/
 			window.open(url+"game/"+val, val);
-
 		}
 
 		function player_sign_out(){
@@ -218,6 +229,7 @@
 			if(player_name.trim() != ""){
 				$("#dsp_player_name").html(player_name);
 				$("#modalEnterName").addClass('fade d-none');
+				$("#menu").removeClass('d-none');
 				set_session("user", player_name);
 			}
 			else{
@@ -234,6 +246,7 @@
 				$("#modalEnterName").removeClass('fade d-none');
 			}
 			else{
+				$("#menu").removeClass('d-none');
 				$("#dsp_player_name").html(player_name);
 			}
 		}

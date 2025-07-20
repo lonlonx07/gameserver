@@ -223,19 +223,12 @@
 
         let active_players = []
         function start_game(){
-            room_data['status'] = "begin";
-            room_data['winner'] = 0;
-            room_data['winner'] = 0;
-            room_data['turn'] = parseInt(ind_arr[1]);
-            for(i=0; i<active_players.length; i++){
-                room_data[active_players[i]]['block'] = 0;
-            }
-            $("#game_msg").html("");
-            socket.emit("command", ["set", "update", ind_arr[0], "", "*", room_data]);
+            socket.emit("command", ["", "start", ind_arr[0], "", "*", ""]);
         }
 
         function display_winner(){
             $("#game_msg").html(room_data[room_data['winner']]['name'] + " Win!");
+            $("#btn_play").html("Play Again");
             $("#btn_play").removeClass('d-none');
         }
 
@@ -258,15 +251,21 @@
             let tmp_ava;
             for(i=0; i<active_players.length; i++){
                 if(room_data['turn'] != active_players[i]){
-                    tmp_ava = img_dir+"ava-"+active_players[i]+".png";
-                    $("#g_"+board_index[room_data[active_players[i]]['block']-1]).html("<img class='board-piece' src='"+tmp_ava+"'>");
+                    if(room_data[active_players[i]]['block'] != room_data['moves'][move_ind_ctr]){
+                        tmp_ava = img_dir+"ava-"+active_players[i]+".png";
+                        $("#g_"+board_index[room_data[active_players[i]]['block']-1]).html("<img class='board-piece' src='"+tmp_ava+"'>");
+                    }
                 }
                 else{
                     tmp_ava = img_dir+"ava-"+room_data['target_char']+".png";
                     $("#g_"+board_index[room_data['moves'][move_ind_ctr]-1]).html("<img class='board-piece' src='"+tmp_ava+"'>");
                 }
             }
-            if(move_ind_ctr == room_data['moves'].length-1){
+            
+            
+            let moves_len = room_data['moves'].length-1;
+        
+            if(move_ind_ctr == moves_len){
                 clearInterval(move_timer);
                 room_data[room_data['target_char']]['block'] = room_data['moves'][move_ind_ctr];
                 if(room_data['moves'][move_ind_ctr] == 100){
@@ -296,26 +295,32 @@
                 socket.emit("command", ["set", "target", ind_arr[0], "", "*", room_data]);
             }
             else{
-                if(ladder[room_data['moves'][move_ind_ctr]] != undefined && move_ind_ctr == room_data['moves'].length-1){
-                    $("#game_msg").html("Yeah!");
+                if(room_data['dice_rnd'] == moves_len && move_ind_ctr == moves_len-1){
+                   if(ladder[room_data['moves'][moves_len-1]] != undefined){
+                        $("#game_msg").html("Yeah!");
+                    }
+                    else if(snake[room_data['moves'][moves_len-1]] != undefined){
+                        $("#game_msg").html("Oh no!");
+                    }
                 }
-                else if(snake[room_data['moves'][move_ind_ctr]] != undefined && move_ind_ctr == room_data['moves'].length-1){
-                    $("#game_msg").html("Oh no!");
-                }
-                else{
-                    $("#game_msg").html("Proceed to block "+room_data['moves'][room_data['moves'].length-1]);
-                }
+                
                 move_ind_ctr++;
             }
         }
 
         function draw_stop(){
-            //$("#game_msg").html(room_data[room_data['turn']]['name']+" proceed to block "+room_data[room_data['turn']]['block']);
             $("#dice_static").removeClass('d-none');
             $("#dice_anim").addClass('d-none');
             $("#dice_static").removeClass('d-none');
             
             clearInterval(draw_timer);
+
+            let moves_len = room_data['moves'].length-1;
+            if(room_data['dice_rnd'] == moves_len)
+                $("#game_msg").html("Proceed to block "+room_data['moves'][moves_len-1]);
+            else
+                $("#game_msg").html("Proceed to block "+room_data['moves'][moves_len]);
+
             dsp_dice_result();
             move_timer = setInterval(move_char, 1000);
         }
@@ -416,7 +421,33 @@
 		}
 
         socket.on('player_data', function(server_data) {
-            
+            if(server_data[1] == "start"){
+                room_data['status'] = "begin";
+                room_data['winner'] = 0;
+                room_data['turn'] = parseInt(ind_arr[1]);
+                for(i=0; i<active_players.length; i++){
+                    room_data[active_players[i]]['block'] = 0;
+                }
+
+                $(".board-cell").html("");
+                $("#game_msg").html("");
+                socket.emit("command", ["set", "update", ind_arr[0], "", "*", room_data]);
+            }
+            else{
+                data = server_data[0];
+                let obj = Object.keys(data);
+                for(i=1; i<=obj.length; i++){
+                    try{
+                        if(data['dice_stat'] == "static"){
+                            let tmp_ava = img_dir+"ava-"+i+".png";
+                            if(data[i]['block'] == data[ind_arr[1]]['block'] && data[i]['pid'] != data[ind_arr[1]]['pid'])
+                                tmp_ava = img_dir+"ava-"+ind_arr[1]+".png";
+                            $("#g_"+board_index[data[i]['block']-1]).html("<img class='board-piece' src='"+tmp_ava+"'>");
+
+                        }
+                    }catch(e){}
+                }
+            }
         }); 
 
         socket.on('room_data', function(server_data) {
@@ -442,76 +473,79 @@
                     }
                 }
                 else{
-                for(i=1; i<=obj.length; i++){
-                    try{
-                        if(data['dice_stat'] == "static"){
-                            let tmp_ava = img_dir+"ava-"+i+".png";
-                            $("#g_"+board_index[data[i]['block']-1]).html("<img class='board-piece' src='"+tmp_ava+"'>");
-                        }
+                    for(i=1; i<=obj.length; i++){
+                        try{
+                            if(data['dice_stat'] == "static"){
+                                let tmp_ava = img_dir+"ava-"+i+".png";
+                                if(data[i]['block'] == data[ind_arr[1]]['block'] && data[i]['pid'] != data[ind_arr[1]]['pid'])
+                                    tmp_ava = img_dir+"ava-"+ind_arr[1]+".png";
+                                $("#g_"+board_index[data[i]['block']-1]).html("<img class='board-piece' src='"+tmp_ava+"'>");
 
-                        if(data[i]['block'] == 100)
-                            display_winner(i);
+                            }
 
-                        
-                        if(data[i]['status'] != "active"){
-                            $("#p"+i+"_img").attr("src", img_dir+data[i]['char']+".png");
-                            $("#p"+i+"_name").html(data[i]['name']);
-                            $("#p"+i+"_status").html("offline");
-                            if(data['status'] == 'begin'){
-                                $("#p"+i+"_ava").addClass("d-none");
+                            if(data[i]['block'] == 100)
+                                display_winner(i);
+
+                            
+                            if(data[i]['status'] != "active"){
+                                $("#p"+i+"_img").attr("src", img_dir+data[i]['char']+".png");
+                                $("#p"+i+"_name").html(data[i]['name']);
+                                $("#p"+i+"_status").html("offline");
+                                if(data['status'] == 'begin'){
+                                    $("#p"+i+"_ava").addClass("d-none");
+                                }
+                                else{
+                                    $("#p"+i+"_ava").removeClass("d-none");
+                                }
                             }
                             else{
-                                $("#p"+i+"_ava").removeClass("d-none");
-                            }
-                        }
-                        else{
-                            active_players.push(data[i]['pid']);
-                            $("#p"+i+"_name").html(data[i]['name']);
-                            $("#p"+i+"_img").attr('src', img_dir+"ava-"+data[i]['pid']+".png");
-                            $("#p"+i+"_status").html("");
-                            //$("#p"+i+"_block").html(data[i]['block']);
+                                active_players.push(data[i]['pid']);
+                                $("#p"+i+"_name").html(data[i]['name']);
+                                $("#p"+i+"_img").attr('src', img_dir+"ava-"+data[i]['pid']+".png");
+                                $("#p"+i+"_status").html("");
+                                //$("#p"+i+"_block").html(data[i]['block']);
 
-                            if(data['status'] == 'begin'){
-                                if(data['winner'] == ""){
-                                    if(data['turn'] == data[i]['pid']){
-                                        $("#p"+i+"_indc").addClass("blinker");
-                                    }
-                                    else{
-                                        $("#p"+i+"_indc").removeClass("blinker");
+                                if(data['status'] == 'begin'){
+                                    if(data['winner'] == ""){
+                                        if(data['turn'] == data[i]['pid']){
+                                            $("#p"+i+"_indc").addClass("blinker");
+                                        }
+                                        else{
+                                            $("#p"+i+"_indc").removeClass("blinker");
+                                        }
                                     }
                                 }
                             }
                         }
+                        catch(e){
+                            if(data['status'] == "begin")
+                                $("#player"+i).addClass("d-none");
+                        }
                     }
-                    catch(e){
-                        if(data['status'] == "begin")
-                            $("#player"+i).addClass("d-none");
+                    
+                    
+                    if(parseInt(ind_arr[1]) == data['turn']){
+                        player_turn = data['turn'];
+                        $("#act_ind").html("TAP HERE");
                     }
-                }
-                
-                
-                if(parseInt(ind_arr[1]) == data['turn']){
-                    player_turn = data['turn'];
-                    $("#act_ind").html("TAP HERE");
-                }
-                else{
-                    player_turn = 0;
-                    $("#act_ind").html("&nbsp;");
-                }
-                
-                if(data['status'] != "begin" && data['players'] >= data['min_players']){
-                    $("#btn_play").removeClass('d-none');
-                }
-                else{
-                    $("#btn_play").addClass('d-none');
-                }
-                
-                if(data['status'] == "begin" && data['dice_stat'] == "draw"){
-                    on_draw_dice();
-                }
-                else{
-                    dsp_dice_result();
-                }
+                    else{
+                        player_turn = 0;
+                        $("#act_ind").html("&nbsp;");
+                    }
+                    
+                    if(data['status'] != "begin" && data['players'] >= data['min_players']){
+                        $("#btn_play").removeClass('d-none');
+                    }
+                    else{
+                        $("#btn_play").addClass('d-none');
+                    }
+                    
+                    if(data['status'] == "begin" && data['dice_stat'] == "draw"){
+                        on_draw_dice();
+                    }
+                    else{
+                        dsp_dice_result();
+                    }
                 }
             }
         });
