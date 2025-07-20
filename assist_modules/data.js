@@ -146,14 +146,7 @@ function mthd_set_data(data){
     let ret = "";
 
     players[room_id]['stamp'] = sec_stamp();
-    if(data[1] == "logout"){
-        players[room_id]['players']--;
-        if(players[room_id]['players'] <= 0)
-            delete players[room_id];
-        else
-            delete players[room_id][player_ind];
-    }
-    else if(data[1] == "resume"){
+    if(data[1] == "resume"){
         players[room_id][player_ind]['status'] = 'active';
         players[room_id]['players']++;
     }
