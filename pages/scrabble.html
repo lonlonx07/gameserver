@@ -1,0 +1,587 @@
+<html>
+    <link href="../assets/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<link href="../assets/css/mystyle.css" rel="stylesheet">
+    <link href="../assets/css/scrabble.css" rel="stylesheet">
+    <title>SCRABBLE</title>
+	<style>
+        
+	</style>
+	<body>
+        <div class="container-fluid">	
+            <div id="game_portal" class="row align-center h-100 d-none">
+                <div class="menu col-md-6 text-center">
+                    <div class="row">
+                        <div class="col-md-12 mb-5 text-center">
+                            <div class="mb-5 fs-2">CREATE NEW ROOM</div>
+                            <span><button id="btn_create" class="btn btn-primary" onclick="create_room()">CREATE</button></span>
+                        </div> 
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-12 mt-5 text-center">
+                            <div class="mb-5 fs-2">JOIN EXISTING ROOM</div>
+                            <strong>ENTER ROOM ID</strong>
+                            <br/>
+                            <input id="room_id" class="inp" placeholder="enter room id" onkeyup="join_room()">
+                            <br/><br/>
+                            <button id="btn_join" class="btn btn-primary" onclick="join_room()">JOIN</button>
+                       </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 h-100 " style="border-left-style: groove;border-left: solid 1px ;border-color:gray;">
+                    <h3><strong>ROOM LIST</strong></h3>
+                    <div id="room_list" style="max-height:90%; overflow:auto;"></div>
+                </div>
+            </div>
+
+            <div id="game" class="d-none">
+                <div class="row bg-primary">
+                    <div class="p-2 d-flex justify-content-between">
+                        <div class="col text-white fs-5 fw-bold">
+                            SCRABBLE
+                        </div>
+                        <div id="room_controls">
+                            <span class="badge d-flex fs-6 align-items-center text-bg-primary rounded-pill">
+                                <strong>ROOM ID:</strong>&ensp;<span id="room_id_dsp" class="" >???</span>
+                                <i id="btn_copy" class="btn btn-primary fa-solid fa-copy" onclick="copy_room_id()" title="copy"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row p-2">
+                        <div class="col-2">
+                            <div id="player1" class="card shadow-sm">
+                                <div class="card-body">
+                                    <div class="text-center">
+                                        <img class="player-ava" id="p1_img" src="../images/snakes-and-ladders/unknown.png">
+                                        <div><span id="p1_name" class="card-text player-name">???</span></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="btn-group">
+                                            <small id="p1_status"></small>
+                                        <!--a id="p1_pass_turn" class="btn btn-sm btn-outline-secondary d-none" onclick="">PASS</a-->
+                                        </div>
+                                        <div class="indc" id="p1_indc"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br/>
+                            <div id="player3" class="card shadow-sm">
+                                <div class="card-body">
+                                    <div class="text-center">
+                                        <img class="player-ava" id="p3_img" src="../images/snakes-and-ladders/unknown.png">
+                                        <div><span id="p3_name" class="card-text player-name">???</span></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="btn-group">
+                                            <small id="p3_status"></small>
+                                        <!--a id="p3_pass_turn" class="btn btn-sm btn-outline-secondary d-none" onclick="">PASS</a-->
+                                        </div>
+                                        <div class="indc" id="p3_indc"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-8 text-center">
+                            <div class="row h-80">
+                                <div class="col-12 p-3">
+                                    <div style="max-height:60%; overflow:auto; margin:10px;">
+                                        <div id="game_board"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="game_controls" class="fixed-bottom mt-5 w-100">
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <td style="width:100px;background-color:black;text-align: center;">
+                                            <!--img class="d-none" id="dice_anim" src="../images/snakes-and-ladders/dice-anim.gif" width="120px" height="120px">
+                                            <img class="button-mode" id="dice_static" src="../images/snakes-and-ladders/dice_1.png" onclick="init_draw_dice()" width="120px" height="120px"-->
+											<div class="position-relative">
+                                                <img class="button-mode" id="dice_static" src="../images/scrabble/pouch.jpg" width="100px" height="100px">
+                                                <br/>
+                                                <div id="pouch_bag">100</div>
+                                            </div>
+
+                                            <label style="width:100%;color: white;text-align:center;">Tiles Left</label>
+                                            <!--label id="act_ind">&nbsp;</label-->
+                                        </td>
+                                        <td style="width: 500px;text-align: center;">
+                                            <button id="btn_play" class="btn btn-primary mt-2 d-none" onclick="start_game()">START</button>
+                                            <div id="player_rack">&nbsp;</div>
+                                            <div id="btn_controls" class="d-none">
+                                                <button id="btn_cancel" class="btn btn-primary mt-2" onclick="cancel_compose()">CANCEL</button>
+                                                <button id="btn_submit" class="btn btn-primary mt-2" onclick="submit_compose()">SUBMIT</button>
+                                                <button id="btn_skip" class="btn btn-primary mt-2" onclick="">SKIP</button>
+                                                <button id="btn_approve" class="btn btn-primary mt-2" onclick="">APPROVE</button>
+                                            </div>
+                                        </td>
+                                        <td  style="width:200px;background-color:black;text-align: center;">
+                                            <label id="game_msg" style="color: white;"><h3>Marlon's<br/>Turn</h3></label>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="col-2">
+                            <div id="player2" class="card shadow-sm">
+                                <div class="card-body">
+                                    <div class="text-center">
+                                        <img class="player-ava" id="p2_img" src="../images/snakes-and-ladders/unknown.png">
+                                        <div><span id="p2_name" class="card-text player-name">???</span></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="btn-group">
+                                            <small id="p2_status"></small>
+                                        <!--a id="p2_pass_turn" class="btn btn-sm btn-outline-secondary d-none" onclick="">PASS</a-->
+                                        </div>
+                                        <div class="indc" id="p2_indc"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br/>
+                            <div id="player4" class="card shadow-sm">
+                                <div class="card-body">
+                                    <div class="text-center">
+                                        <img class="player-ava" id="p4_img" src="../images/snakes-and-ladders/unknown.png">
+                                        <div><span id="p4_name" class="card-text player-name">???</span></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="btn-group">
+                                            <small id="p4_status"></small>
+                                        <!--a id="p4_pass_turn" class="btn btn-sm btn-outline-secondary d-none" onclick="">PASS</a-->
+                                        </div>
+                                        <div class="indc" id="p4_indc"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>    
+            </div>
+
+            
+        </div>                            
+	</body>
+
+	<script src="/socket.io/socket.io.js"></script>
+    <script src="../assets/dist/js/jquery-3.6.3.js"></script>
+    <script src="../assets/js/scripts.js"></script>
+	<script>
+        let img_dir = "../images/scrabble/";
+        let player_piece = "";
+        let room_data = {};
+        let player_turn = 0;
+        let ind_arr;
+        let game_id = "scrabble";
+        let room_index = [
+            ["title","SCRABBLE"], 
+            ["game_id",game_id],
+            ["id","room_id"], 
+            ["max_players",4],
+            ["min_players",2],
+            ["t_limit",3600], 
+            ["turn","int"],
+            ["next_turn","int"],
+            ["winner","int"],
+            ["status", ""],
+            ["board", "array"],
+            ["temp", "array"],
+            ["pouch_bag", "array"]
+        ];
+        let player_index = [
+            ["pid","player_ind"], 
+            ["name",player_name], 
+            ["status","active"], 
+            ["char","string"],
+            ["score","int"],
+            ["rack","array"],
+            ["rack2","array"]
+        ];
+
+        let pouch = ['','_','a1','b3','c3','d2','e1','f4','g2','h4','i1','j8','k5','l1','m3','n1','o1','p3','q10','r1','s1','t1','u1','v4','w4','x8','y4','z10'];
+        let sp_cells = [];
+        let std_tile_piece = {'_':2,'a1':9,'b3':2,'c3':2,'d2':4,'e1':12,'f4':2,'g2':3,'h4':2,'i1':9,'j8':1,'k5':1,'l1':4,'m3':2,'n1':6,'o1':8,'p3':2,'q10':1,'r1':6,'s1':4,'t1':6,'u1':4,'v4':2,'w4':2,'x8':1,'y4':2,'z10':1}
+
+        let active_players = []
+        function start_game(){
+            socket.emit("command", ["", "start", ind_arr[0], "", "*", ""]);
+        }
+
+        function display_winner(){
+            $("#game_msg").html(room_data[room_data['winner']]['name'] + " Win!");
+            $("#btn_play").html("Play Again");
+            $("#btn_play").removeClass('d-none');
+            $("#btn_controls").addClass('d-none');
+        }
+        
+        function set_board(){
+			let str = "";
+            let ctr = 1;
+
+            let tws = [1,8,15,106,120,211,218,225];
+            let dws = [17,29,33,43,49,57,65,71,155,161,169,177,183,193,197,209];
+            let tls = [21,25,77,81,85,89,137,141,145,149,201,205];
+            let dls = [4,11,37,39,46,53,60,93,97,99,103,109,117,123,127,129,133,166,173,180,187,189,214,222];
+            let i;
+                    
+            for(i=0; i<tws.length; i++){
+                sp_cells[tws[i]] = "tws";
+            }
+
+            for(i=0; i<dws.length; i++){
+                sp_cells[dws[i]] = "dws";
+            }
+
+            for(i=0; i<tls.length; i++){
+                sp_cells[tls[i]] = "tls";
+            }
+
+            for(i=0; i<dls.length; i++){
+                sp_cells[dls[i]] = "dls";
+            }
+
+			for(let g=1; g<=15; g++){
+                for(let h=1; h<=15; h++){
+                    str += "<div ondrop='dropHandler(event)' ondragover='dragoverHandler(event)' class='board-cell' id='cell_"+ctr+"' tile_index='"+ctr+"'></div>";
+                    ctr++;
+                }
+			}
+			
+            $("#game_board").html(str);
+
+			for(let j=1; j<=255; j++){
+                    if(j==113){
+                        $("#cell_"+j).css('background-image', "url('"+img_dir+"scrabble_star.png')");
+                    }
+                    else if(sp_cells[j] != undefined){
+                        $("#cell_"+j).css('background-image', "url('"+img_dir+"scrabble_"+sp_cells[j]+".png')");
+                    }
+
+                    $("#cell_"+j).css('background-size', '53px 58px');
+					$("#cell_"+j).css('background-color', '#FFCC99');
+					$("#cell_"+j).css('background-repeat', 'no-repeat');
+			}
+		}
+
+        function set_player_rack(){
+            let str = "";
+            for(let i=0; i<room_data[ind_arr[1]]['rack'].length; i++){
+                let ind = room_data[ind_arr[1]]['rack'][i];
+                
+                str += "<img letter='"+ind[0]+"' t_ind='"+ind+"' r_ind='"+i+"' class='tile_piece' draggable='true' ondragstart='dragstartHandler(event)' src='"+img_dir+"/tiles/"+ind+".png'>";
+            }
+
+            $("#player_rack").html(str);
+        }
+
+        function draw_pouch_bag(ind){ 
+            if(room_data['pouch_bag'].length > 0){
+                let tiles_ctr = room_data[ind]['rack'].length;
+                while(tiles_ctr < 7){
+                    let rnd = get_random_num(room_data['pouch_bag'].length);
+                    room_data[ind]['rack'][tiles_ctr] = room_data['pouch_bag'][rnd-1];
+                    tiles_ctr++;
+                    room_data['pouch_bag'].splice(rnd-1, 1);
+                    if(room_data['pouch_bag'].length == 0)
+                        break;
+                }
+            }
+        }
+
+        function sort_array(arr, order){
+            let i;
+            let tmp;
+            for(let i=0; i<arr.length-1; i++){
+                for(let j=i+1; j<arr.length; j++){
+                    let ind_a = parseInt(arr[i]);
+                    let ind_b = parseInt(arr[j]);
+                    if(order == "asc"){
+                        if(ind_a>ind_b){
+                            tmp = arr[i];
+                            arr[i] = arr[j];
+                            arr[j] = tmp;
+                        }
+                    }
+                    else{
+                        if(ind_a<ind_b){
+                            tmp = arr[i];
+                            arr[i] = arr[j];
+                            arr[j] = tmp;
+                        }
+                    }
+                }
+            }
+        }
+
+        function submit_compose(){
+            sort_array(room_data['temp'], "asc");
+            if(room_data['temp'].length != 0){
+                let str = "";
+                let sco_cnt = 0;
+                let i;
+
+                draw_pouch_bag(room_data['turn']);
+
+                for(i=0; i<room_data['temp'].length; i++){
+                    str += room_data['board'][room_data['temp'][i]][0]+" ";
+                    sco_cnt += 1;
+                }
+                
+                for(i=0; i<active_players.length; i++){
+                    if(room_data['turn'] == active_players[i]){
+                        room_data['turn'] = active_players[i+1];
+                        break;
+                    }
+                }
+                
+                if(room_data['turn'] == undefined){
+                    room_data['turn'] = 1;
+                }
+
+                room_data['temp'] = [];
+                socket.emit("command", ["set", "update", ind_arr[0], "", "*", room_data]);
+            }
+        }
+
+        function cancel_compose(){
+            if(room_data['temp'].length != 0){
+                for(let i=0; i<room_data['temp'].length; i++){
+                    room_data[player_turn]['rack'].push(room_data['board'][room_data['temp'][i]]);
+                }
+
+                for(let j=1; j<=255; j++){
+                    for(let k=0; k<room_data['temp'].length; k++){
+                        if(room_data['temp'][k] == j){
+                            room_data['board'][j] = "";
+                        }
+                    }
+                }
+                
+                room_data['temp'] = []
+                set_player_rack();
+            }
+            socket.emit("command", ["set", "target", ind_arr[0], "", "*", room_data]);
+        }
+
+        function dragstartHandler(ev) {
+            ev.dataTransfer.setData("tile_ind", $(ev.target).attr("t_ind"));
+            ev.dataTransfer.setData("rack_ind", $(ev.target).attr("r_ind"));
+        }
+
+        function dragoverHandler(ev) {
+            ev.preventDefault();
+        }
+
+        function dropHandler(ev) {
+            ev.preventDefault();
+            const tile_ind = ev.dataTransfer.getData("tile_ind");
+            const rack_ind = ev.dataTransfer.getData("rack_ind");
+            let ind = parseInt($(ev.target).attr("tile_index"));
+
+            if(room_data['board'][ind] == ''){
+                room_data['board'][ind] = tile_ind;
+                room_data['temp'].push(ind);
+                room_data[player_turn]['rack'].splice(parseInt(rack_ind),1);
+                //$(ev.target).html("<img class='tile_board' draggable='false' src='"+img_dir+"/tiles/"+tile_ind+".png'>");
+                set_player_rack();
+                socket.emit("command", ["set", "target", ind_arr[0], "", "*", room_data]);
+            }
+        }
+    
+        socket.on('player_data', function(server_data) {
+            if(server_data[1] == "start"){
+                room_data['status'] = "begin";
+                room_data['winner'] = 0;
+                room_data['turn'] = parseInt(ind_arr[1]);
+
+                for(i=0; i<Object.keys(std_tile_piece).length; i++){
+                    for(j=0; j<std_tile_piece[Object.keys(std_tile_piece)[i]]; j++){
+                        room_data['pouch_bag'].push(Object.keys(std_tile_piece)[i]);
+                    }
+                    /*if(room_data['pouch_bag'].length>22)
+                        break;*/
+                }
+
+                for(i=0; i<active_players.length; i++){
+                    draw_pouch_bag(active_players[i]);
+                }
+
+                $(".board-cell").html("");
+                $("#game_msg").html("");
+
+                for(let j=1; j<=255; j++){  
+                    room_data['board'][j] = "";
+                }
+
+                socket.emit("command", ["set", "update", ind_arr[0], "", "*", room_data]);
+            }
+            else{
+                data = server_data[0];
+                for(i=1; i<=data['board'].length; i++){
+                    if(data['board'][i] != ''){
+                        $("#cell_"+i).html("<img class='tile_board' draggable='false' src='"+img_dir+"/tiles/"+data['board'][i]+".png'>");
+                    }
+                    else{
+                        $("#cell_"+i).html("");
+                    }
+                }
+
+                /*let obj = Object.keys(data);
+                for(i=1; i<=obj.length; i++){
+                   
+                }*/
+            }
+        }); 
+
+        socket.on('room_data', function(server_data) {
+            let str = "";
+            active_players = []
+            let data = server_data[0];
+            let room_event = server_data[1];
+            let p_ind = server_data[2];
+            if(data == "room-error"){
+                alert("Room error problem occured. [Room doesn't exist]");
+            }
+            else{
+                let obj = Object.keys(data);
+                $("#game").removeClass("d-none");
+                $("#room_id_dsp").html(data['id']);
+                room_data = data;
+                if(room_event == "suspend" || room_event == "resume"){
+                    if(room_event == "resume"){
+                        $("#p"+p_ind+"_status").html("");
+                    }
+                    else{
+                        $("#p"+p_ind+"_status").html("offline");
+                    }
+                }
+                else{
+                    for(i=1; i<=obj.length; i++){
+                        try{
+                            
+                            if(data[i]['status'] != "active"){
+                                $("#p"+i+"_img").attr("src", img_dir+data[i]['char']+".png");
+                                $("#p"+i+"_name").html(data[i]['name']);
+                                $("#p"+i+"_status").html("offline");
+                                if(data['status'] == 'begin'){
+                                    $("#p"+i+"_ava").addClass("d-none");
+                                }
+                                else{
+                                    $("#p"+i+"_ava").removeClass("d-none");
+                                }
+                            }
+                            else{
+                                active_players.push(data[i]['pid']);
+                                $("#p"+i+"_name").html(data[i]['name']);
+                                $("#p"+i+"_img").attr('src', img_dir+"ava-"+data[i]['pid']+".png");
+                                $("#p"+i+"_status").html("");
+
+                                if(data['status'] == 'begin'){
+                                    if(data['winner'] == ""){
+                                        if(data['turn'] == data[i]['pid']){
+                                            $("#p"+i+"_indc").addClass("blinker");
+                                        }
+                                        else{
+                                            $("#p"+i+"_indc").removeClass("blinker");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        catch(e){
+                            if(data['status'] == "begin")
+                                $("#player"+i).addClass("d-none");
+                        }
+                    }
+
+                    for(i=1; i<=data['board'].length; i++){
+                        if(data['board'][i] != '')
+                            $("#cell_"+i).html("<img class='tile_board' draggable='false' src='"+img_dir+"/tiles/"+data['board'][i]+".png'>");
+                    }
+                    
+                    
+                    if(parseInt(ind_arr[1]) == data['turn']){
+                        player_turn = data['turn'];
+                        //$("#act_ind").html("DRAW");
+                    }
+                    else{
+                        player_turn = 0;
+                        //$("#act_ind").html("&nbsp;");
+                    }
+                    
+                    if(data['status'] != "begin" && data['players'] >= data['min_players']){
+                        $("#btn_play").removeClass('d-none');
+                    }
+                    else{
+                        $("#btn_play").addClass('d-none');
+                    }
+                    
+                    if(data['status'] == "begin"){
+                        $("#btn_controls").removeClass('d-none');
+                        set_player_rack();
+                    }
+                    else{
+                        $("#btn_controls").addClass('d-none');
+                    }
+                }
+                if(data['status'] == "begin"){
+                    if(player_turn != ind_arr[1])
+                        $("#btn_controls").addClass('d-none');
+                    
+                    $("#pouch_bag").html(room_data['pouch_bag'].length);
+                }
+            }
+        });
+
+        function init_game(stat){
+            $("#game_portal").addClass("d-none");
+            $("#game").addClass("d-none");
+
+            if(stat == "portal"){
+                $("#game_portal").removeClass("d-none");
+            }
+            else if(stat == "game"){
+                socket.emit("command", ["get", "update", ind_arr[0], parseInt(ind_arr[1]), "*"]);
+                $("#game").removeClass("d-none");
+                set_board();
+            }
+        }
+
+        window.onload = function(){
+            if(player_name == null){
+                $("body").css("textAlign", "center");
+                $("body").css("paddingTop", "20px");
+                $("body").html("Invalid access!");
+            }
+            else{
+                ind_arr = get_session("session");
+                if(ind_arr.length == 0){
+                    socket.emit("room_list", game_id);
+                    init_game('portal');
+                }
+                else{
+                    socket.emit("rejoin_room", ["set", "resume", ind_arr[0], parseInt(ind_arr[1])], "*");
+                    init_game('game');
+                }    
+            }       
+        }
+
+        window.onbeforeunload = function(){
+            if(ind_arr.length != 0){
+                socket.emit("command", ["set", "suspend", ind_arr[0], parseInt(ind_arr[1]), "*"]);
+            }
+            
+            /*if(ind_arr.length != 0){
+                event.preventDefault();
+                event.returnValue = ''; 
+                socket.emit("command", ["set", "suspend", ind_arr[0], parseInt(ind_arr[1]), "*"]);
+            }*/
+        }
+
+	</script>
+</html>
