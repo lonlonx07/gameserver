@@ -116,8 +116,16 @@
 		}
 
 		.board-cell {
+			position: relative;
 			border: 1px solid black;
 			font-size: 30px;
+		}
+
+		.sp-tile {
+			position: absolute;
+			font-size: 35px;
+			margin-top: 0px;
+			margin-left: 15px;
 		}
 
 		.tile_piece {
@@ -159,6 +167,13 @@
 			}
 		}
 
+		.hl-tiles {
+			/*filter: sepia(90%) saturate(300%) brightness(90%) hue-rotate(100deg);*/
+			/*filter: sepia(80) hue-rotate(1deg) saturate(150) contrast(10) brightness(90%);*/
+			border: solid 1px rgb(96, 235, 96);
+			background-color: rgb(96, 235, 96);
+		}
+
 		#pouch_bag {
 			position:absolute;
 			width:100%;
@@ -166,6 +181,29 @@
 			color:rgb(49, 49, 49);
 			font-size: 25px;
 			font-weight: 600;
+		}
+
+		#btn_play {
+			position:absolute;
+			top:-70px;
+		}
+
+		#player_rack {
+			position:absolute;
+			top:-30px;
+			margin: 0px auto 0px auto;
+			height: 70px;
+			width: 500px;
+		}
+
+		#btn_controls {
+			position:absolute;
+			top:0px;
+		}
+		
+		#turn_controls {
+			position:absolute;
+			top:-60px;
 		}
 		
 		#act_ind {
