@@ -1,5 +1,6 @@
 authorize_users = {'lonlonx':'12345678'}
 players = {}
+dictionary = {}
 
 function sec_stamp(){
     return parseInt(Date.now()/1000);

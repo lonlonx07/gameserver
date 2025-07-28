@@ -3,9 +3,24 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const port = process.env.PORT || 10001;
+const fs = require('node:fs');
+
 
 app.use(express.static(__dirname+'/public'));
 const mod_data = require('./assist_modules/data');
+
+fs.readFile(__dirname+'/public/images/scrabble/scrabble_words.txt', 'utf8', (err, data) => {
+  if (err) {
+    //console.error(err);
+    return;
+  }
+  let arr = data.split("\n")
+  let dictionary = {}
+  for(let i=0; i<arr.length; i++){
+    dictionary[arr[i].trim()] = 1;
+  }
+  mod_data.dictionary = dictionary;
+});
 
 app.get('/', (req, res) => {
 	res.sendFile(__dirname + '/pages/home.html');
@@ -109,6 +124,19 @@ io.on('connection', (socket) => {
         }
 	});
 
+    socket.on('word_checker', data => {
+        let ret = [];
+        for(let i=0; i<data.length; i++){
+            let w = mod_data.dictionary[data[i]];
+            if(w == null){
+                ret.push("");
+            }
+            else{
+                ret.push(data[i]);
+            }
+        }
+        io.to(socket.id).emit("word_checker_return", [ret, data]);
+    });
 });
 
 http.listen(port, () => {
