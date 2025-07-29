@@ -178,7 +178,7 @@
                         <div id="game_controls" class="position-fixed sticky-bottom w-100">
                             <table class="table table-bordered" style="width:98.3%;">
                                 <tr>
-                                    <td style="width:120px;background-color:black;text-align: center;">
+                                    <td style="width:170px;background-color:black;text-align: center;">
                                         <div class="position-relative"  ondrop='pouch_dropHandler(event)' ondragover='pouch_dragoverHandler(event)' id="pouch">
                                             <img class="button-mode" id="dice_static" src="../images/scrabble/pouch.jpg" width="100px" height="100px">
                                             <br/>
@@ -187,7 +187,7 @@
 
                                         <label style="width:100%;color: white;text-align:center;">Tiles Left</label>
                                     </td>
-                                    <td style="width:500px;text-align: center;">
+                                    <td id="interact_area" style="width:500px;text-align:center;">
                                         <div id="btn_controls" class="d-flex justify-content-between position-relative">
                                             <button id="btn_submit" class="btn btn-primary mt-2" onclick="check_word_composition()">SUBMIT</button>
                                             <button id="btn_cancel" class="btn btn-danger mt-2" onclick="cancel_compose()">CANCEL</button>
@@ -204,7 +204,7 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td  style="width:200px;background-color:black;text-align: center;">
+                                    <td  style="width:170px;background-color:black;text-align: center;">
                                         <label id="game_msg" style="color:white;font-weight:bold;">Waiting for players...</label>
                                     </td>
                                 </tr>
@@ -314,7 +314,7 @@
                     cbox_str += "<option value='"+tile_sets_letters[tmp_ind[i]]+"'>"+(tile_sets_letters[tmp_ind[i]].toUpperCase())+"</option>"
                 }
             }
-            
+
             $("#st_letter_inp").html(cbox_str);
             $("#game_board_holder").css("maxHeight", (window.innerHeight*.68)+"px");
             $("#game_controls").css("maxHeight", "150px");
@@ -1049,27 +1049,33 @@
         socket.on('word_checker_return', function(data) {
             let invalid_str = "";
             let valid_str = "";
+    
             for(let i=0; i<data[0].length; i++){
+                let w_sep = "";
+                if(i<data[0].length-1){
+                    w_sep = " │ ";
+                }
+
                 if(data[0][i] == ""){
-                    invalid_str += data[1][i].toUpperCase()+" ";
+                    invalid_str += "<span class='failed-hl'>"+data[1][i].toUpperCase()+"</span>"+w_sep;
                 }
                 else{
-                    valid_str += data[1][i].toUpperCase()+" ";
+                    valid_str += "<span class='success-hl'>"+data[1][i].toUpperCase()+"</span>"+w_sep;
                 }
             }
 
             if(valid_str != "" && invalid_str == ""){
-                room_data['result_msg'] = room_data[player_turn]['name'] + " move accepted with +"+room_data[player_turn]['temp_sco']+" points<br/><br/>"+"Valid word: " + valid_str;
+                room_data['result_msg'] = room_data[player_turn]['name'] + " move accepted with <span class='success-hl'>+"+room_data[player_turn]['temp_sco']+"</span> points<br/><br/>"+"Valid word(s): " + valid_str;
                 room_data['word_count'] = data[0].length;
                 //test_word_list(valid_str, "con");
                 submit_compose();
             }
             else if(invalid_str != ""){
-                room_data['result_msg'] = room_data[player_turn]['name'] + " made an invalid move<br/><br/>"+"Invalid word: " + invalid_str;
+                room_data['result_msg'] = room_data[player_turn]['name'] + " made an invalid move<br/><br/>"+"Invalid word(s): " + invalid_str;
                 socket.emit("command", ["set", "target", ind_arr[0], "", "*", room_data]);
             }
             else{
-                room_data['result_msg'] = room_data[player_turn]['name'] + " made an invalid move" + "Valid word: " + valid_str +"<br/>Invalid word: " + invalid_str;
+                room_data['result_msg'] = room_data[player_turn]['name'] + " made an invalid move" + "Valid word(s): " + valid_str +"<br/>Invalid word(s): " + invalid_str;
                 socket.emit("command", ["set", "target", ind_arr[0], "", "*", room_data]);
             }
         });
