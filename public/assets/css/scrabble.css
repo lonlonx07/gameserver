@@ -121,6 +121,14 @@
 			font-size: 30px;
 		}
 
+		.success-hl {
+			color: rgb(10, 219, 10);
+		}
+
+		.failed-hl {
+			color: rgb(216, 14, 14);
+		}
+
 		.sp-tile {
 			position: absolute;
 			font-size: 35px;
