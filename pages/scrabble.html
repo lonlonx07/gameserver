@@ -175,8 +175,8 @@
 
                 <div class="row">
                     <div class="col-12">
-                        <div id="game_controls" class="position-fixed sticky-bottom w-100">
-                            <table class="table table-bordered" style="width:98.3%;">
+                        <div id="game_controls" class="fixed-bottom mt-5 w-100">
+                            <table class="table table-bordered">
                                 <tr>
                                     <td style="width:170px;background-color:black;text-align: center;">
                                         <div class="position-relative"  ondrop='pouch_dropHandler(event)' ondragover='pouch_dragoverHandler(event)' id="pouch">
@@ -1065,17 +1065,17 @@
             }
 
             if(valid_str != "" && invalid_str == ""){
-                room_data['result_msg'] = room_data[player_turn]['name'] + " move accepted with <span class='success-hl'>+"+room_data[player_turn]['temp_sco']+"</span> points<br/><br/>"+"Valid word(s): " + valid_str;
+                room_data['result_msg'] = room_data[player_turn]['name'] + " move accepted with <span class='success-hl'>+"+room_data[player_turn]['temp_sco']+"</span> points<br/><br/>"+"Valid word(s):<br/>" + valid_str;
                 room_data['word_count'] = data[0].length;
                 //test_word_list(valid_str, "con");
                 submit_compose();
             }
             else if(invalid_str != ""){
-                room_data['result_msg'] = room_data[player_turn]['name'] + " made an invalid move<br/><br/>"+"Invalid word(s): " + invalid_str;
+                room_data['result_msg'] = room_data[player_turn]['name'] + " made an invalid move<br/><br/>"+"Invalid word(s):<br/>" + invalid_str;
                 socket.emit("command", ["set", "target", ind_arr[0], "", "*", room_data]);
             }
             else{
-                room_data['result_msg'] = room_data[player_turn]['name'] + " made an invalid move" + "Valid word(s): " + valid_str +"<br/>Invalid word(s): " + invalid_str;
+                room_data['result_msg'] = room_data[player_turn]['name'] + " made an invalid move" + "Valid word(s):<br/>" + valid_str +"<br/>Invalid word(s):<br/>" + invalid_str;
                 socket.emit("command", ["set", "target", ind_arr[0], "", "*", room_data]);
             }
         });

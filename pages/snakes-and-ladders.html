@@ -92,25 +92,6 @@
                                     <div id="game_board"></div>
                                 </div>
                             </div>
-                            
-                            <div id="game_controls" class="fixed-bottom mt-5 w-100">
-                                <table class="table table-bordered">
-                                    <tr>
-                                        <td style="width:200px;background-color:black;text-align: center;">
-                                            <img class="d-none" id="dice_anim" src="../images/snakes-and-ladders/dice-anim.gif" width="120px" height="120px">
-                                            <img class="button-mode" id="dice_static" src="../images/snakes-and-ladders/dice_1.png" onclick="init_draw_dice()" width="120px" height="120px">
-											<label id="act_ind">&nbsp;</label>
-                                        </td>
-                                        <td style="width: 500px;text-align: center;">
-                                            <h2 id="game_msg">&nbsp;</h2>
-                                            <button id="btn_play" class="btn btn-primary mt-2 d-none" onclick="start_game()">START</button>
-                                        </td>
-                                        <td  style="width:200px;background-color:black;text-align: center;">
-                                            <img class="d-none" id="dice" src="../images/snakes-and-ladders/unknown.png" width="120px" height="120px">
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
                         </div>
 
                         <div class="col-2">
@@ -146,10 +127,31 @@
                                 </div>
                             </div>
                         </div>
-                </div>    
-            </div>
+                </div>  
 
-            
+                <div class="row">
+                    <div class="col-12">  
+                        <div id="game_controls" class="fixed-bottom mt-1 w-100" style="margin-bottom: -20;">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <td style="width:170px;background-color:black;text-align: center;">
+                                        <img class="d-none" id="dice_anim" src="../images/snakes-and-ladders/dice-anim.gif" width="120px" height="120px">
+                                        <img class="button-mode" id="dice_static" src="../images/snakes-and-ladders/dice_1.png" onclick="init_draw_dice()" width="120px" height="120px">
+                                        <label id="act_ind">&nbsp;</label>
+                                    </td>
+                                    <td style="width: 500px;text-align: center;">
+                                        <h2 id="char_msg">&nbsp;</h2>
+                                        <button id="btn_play" class="btn btn-primary mt-2 d-none" onclick="start_game()">START</button>
+                                    </td>
+                                    <td  style="width:170px;background-color:black;text-align: center;">
+                                        <label id="game_msg" style="color:white;font-weight:bold;"></label>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>  
         </div>                            
 	</body>
 
@@ -179,7 +181,8 @@
             ["dice_stat","static"],
             ["ext_move","int"],
             ["moves","array"],
-            ["target_char","int"]
+            ["target_char","int"],
+            ["result_msg","string"]
         ];
         let player_index = [
             ["pid","player_ind"], 
@@ -227,7 +230,7 @@
         }
 
         function display_winner(){
-            $("#game_msg").html(room_data[room_data['winner']]['name'] + " Win!");
+            $("#char_msg").html(room_data[room_data['winner']]['name'] + " Win!");
             $("#btn_play").html("Play Again");
             $("#btn_play").removeClass('d-none');
         }
@@ -269,13 +272,13 @@
                 clearInterval(move_timer);
                 room_data[room_data['target_char']]['block'] = room_data['moves'][move_ind_ctr];
                 if(room_data['moves'][move_ind_ctr] == 100){
-                    //$("#game_msg").html(room_data[room_data['target_char']]['name'] + "Winner!")
+                    //$("#char_msg").html(room_data[room_data['target_char']]['name'] + "Winner!")
                     room_data['winner'] = room_data['target_char'];
                     display_winner();
                     room_data['status'] = "end";
                 }
                 else{
-                    $("#game_msg").html("");
+                    $("#char_msg").html("");
                     $(".indc").removeClass("blinker");
                     $("#p"+room_data['next_turn']+"_indc").addClass("blinker");
 
@@ -297,10 +300,10 @@
             else{
                 if(room_data['dice_rnd'] == moves_len && move_ind_ctr == moves_len-1){
                    if(ladder[room_data['moves'][moves_len-1]] != undefined){
-                        $("#game_msg").html("Yeah!");
+                        $("#char_msg").html("Yeah!");
                     }
                     else if(snake[room_data['moves'][moves_len-1]] != undefined){
-                        $("#game_msg").html("Oh no!");
+                        $("#char_msg").html("Oh no!");
                     }
                 }
                 
@@ -317,9 +320,9 @@
 
             let moves_len = room_data['moves'].length-1;
             if(room_data['dice_rnd'] == moves_len)
-                $("#game_msg").html("Proceed to block "+room_data['moves'][moves_len-1]);
+                $("#char_msg").html("Proceed to block "+room_data['moves'][moves_len-1]);
             else
-                $("#game_msg").html("Proceed to block "+room_data['moves'][moves_len]);
+                $("#char_msg").html("Proceed to block "+room_data['moves'][moves_len]);
 
             dsp_dice_result();
             move_timer = setInterval(move_char, 1000);
@@ -431,6 +434,7 @@
 
                 $(".board-cell").html("");
                 $("#game_msg").html("");
+                $("#char_msg").html("");
                 socket.emit("command", ["set", "update", ind_arr[0], "", "*", room_data]);
             }
             else{
