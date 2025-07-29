@@ -266,7 +266,7 @@
             },
             'dws':{
                 'multi':'2xword',
-                'index':['8_8','2_2','2_14','3_3','3_13','4_4','4_12','5_5','5_11','11_5','11_11','11_4','11_12','11_3','11_13','11_2','11_14']
+                'index':['8_8','2_2','2_14','3_3','3_13','4_4','4_12','5_5','5_11','11_5','11_11','12_4','12_12','13_3','13_13','14_2','14_14']
             },
             'tls':{
                 'multi':'3xletter',
@@ -431,7 +431,7 @@
                     bench_ind += mod;
                 //}catch(e){break;}
             }
-
+            
             return [w, tmp_sco];
         }
 
@@ -446,6 +446,7 @@
                 let tmp_bonus = {}
                 let word_bonus = {'h':0, 'v':0};
                 let letter_bonus = 0;
+                //console.log(room_data['temp'])
                 for(let i=0; i<room_data['temp'].length; i++){
                     let bonus_equiv = bonus_sets[dimen['blk'][room_data['temp'][i]]];
                     let bonus_multi = 0;
@@ -459,7 +460,7 @@
 
                     
                     tmp_w = find_composed_words(room_data['temp'][i], 1);
-                    //console.log(tmp_w)
+                    //console.log(tmp_w, "<1", bonus_equiv)
                     if(tmp_w[0].length > 1){
                         
                         if(bonus_equiv != undefined && (bonus_equiv == "3xword" || bonus_equiv == "2xword")){
@@ -478,9 +479,9 @@
                     }
 
                     tmp_w = find_composed_words(room_data['temp'][i], 15);
-                    //console.log(tmp_w)
+                    //console.log(tmp_w, "<15", bonus_equiv)
                     if(tmp_w[0].length > 1){
-
+                        
                         if(bonus_equiv != undefined && (bonus_equiv == "3xword" || bonus_equiv == "2xword")){
                             tmp_bonus[tmp_w[0]] = bonus_equiv;
                             if(bonus_equiv == "3xword")
@@ -497,6 +498,7 @@
                     }
                 }
 
+                //console.log(word_bonus['h'], word_bonus['v'], letter_bonus);
                 room_data[player_turn]['temp_sco'] += word_bonus['h']+word_bonus['v']+letter_bonus;
                 //console.log(room_data[player_turn]['temp_sco']);
                 
