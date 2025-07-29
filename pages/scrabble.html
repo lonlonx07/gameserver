@@ -16,7 +16,7 @@
                     <div class="row">
                         <div class="col-md-12 mb-5 text-center">
                             <div class="mb-5 fs-2">CREATE NEW ROOM</div>
-                            <span><button id="btn_create" class="btn btn-primary" onclick="create_room()">CREATE</button></span>
+                            <span><button id="btn_create" class="strict-interact btn btn-primary">CREATE</button></span>
                         </div> 
                     </div>
                     <hr>
@@ -25,9 +25,9 @@
                             <div class="mb-5 fs-2">JOIN EXISTING ROOM</div>
                             <strong>ENTER ROOM ID</strong>
                             <br/>
-                            <input id="room_id" class="inp" placeholder="enter room id" onkeyup="join_room()">
+                            <input id="room_id" class="strict-interact inp" placeholder="enter room id">
                             <br/><br/>
-                            <button id="btn_join" class="btn btn-primary" onclick="join_room()">JOIN</button>
+                            <button id="btn_join" class="strict-interact btn btn-primary">JOIN</button>
                        </div>
                     </div>
                 </div>
@@ -175,8 +175,8 @@
 
                 <div class="row">
                     <div class="col-12">
-                        <div id="game_controls" class="sticky-bottom mt-5 w-100">
-                            <table class="table table-bordered">
+                        <div id="game_controls" class="position-fixed sticky-bottom w-100">
+                            <table class="table table-bordered" style="width:98.3%;">
                                 <tr>
                                     <td style="width:120px;background-color:black;text-align: center;">
                                         <div class="position-relative"  ondrop='pouch_dropHandler(event)' ondragover='pouch_dragoverHandler(event)' id="pouch">
@@ -187,7 +187,7 @@
 
                                         <label style="width:100%;color: white;text-align:center;">Tiles Left</label>
                                     </td>
-                                    <td style="width: 500px;text-align: center;">
+                                    <td style="width:500px;text-align: center;">
                                         <div id="btn_controls" class="d-flex justify-content-between position-relative">
                                             <button id="btn_submit" class="btn btn-primary mt-2" onclick="check_word_composition()">SUBMIT</button>
                                             <button id="btn_cancel" class="btn btn-danger mt-2" onclick="cancel_compose()">CANCEL</button>
@@ -316,7 +316,8 @@
             }
             
             $("#st_letter_inp").html(cbox_str);
-            $("#game_board_holder").css("maxHeight", (window.innerHeight*.6)+"px");
+            $("#game_board_holder").css("maxHeight", (window.innerHeight*.68)+"px");
+            $("#game_controls").css("maxHeight", "150px");
             $("#player_rack").css('background-image', "url('../images/scrabble/scrabble_rack.png')");
             $("#player_rack").css('background-repeat', "no-repeat");
             $("#player_rack").css('background-size', "470px 60px");

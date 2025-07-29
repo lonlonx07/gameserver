@@ -6,10 +6,39 @@ let action = "";
 let room_id = "";
 let player_id = "";
 let in_game = false;
-let index_name = {'id':'ROOM ID', 'stamp':'TIMESTAMP', 'pid':'Player ID', 'name':'Name', 'status':'Status', 'data':'Player Data'}
+let disable_gap = 1000;
 let errors = {
     'room-error-1':"Invalid room id!", 'room-error-2':"Room is full!"
 }
+
+$("#btn_create").on("click", function(){
+	$(".strict-interact").attr("disabled", true);
+	setTimeout(function(){
+		$(".strict-interact").attr("disabled", false);
+	}, disable_gap);
+
+    create_room();
+});
+
+$("#btn_join").on("click", function(){
+	$(".strict-interact").attr("disabled", true);
+	setTimeout(function(){
+		$(".strict-interact").attr("disabled", false);
+	}, disable_gap);
+
+    join_room($("#room_id").val());
+});
+
+$("#room_id").on("keyup", function(event){
+    if(event.which == 13){
+        $(".strict-interact").attr("disabled", true);
+        setTimeout(function(){
+            $(".strict-interact").attr("disabled", false);
+        }, disable_gap);
+
+        join_room($("#room_id").val());
+    }
+});
 
 function get_random_num(range){
     return (Math.floor(Math.random() * range)+1)
