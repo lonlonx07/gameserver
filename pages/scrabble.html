@@ -1052,24 +1052,31 @@
             let invalid_str = "";
             let valid_str = "";
             let temp_strg = []
+            let tmp_dup = {}
+            
             for(let i=0; i<data[0].length; i++){
                 let w_sep = "";
+                let tmp_str = "";
                 if(i<data[0].length-1){
                     w_sep = " │ ";
                 }
-
+                
                 if(data[0][i] == ""){
-                    invalid_str += "<span class='failed-hl'>"+data[1][i].toUpperCase()+"</span>";
-                    temp_strg.push(invalid_str);
-                    invalid_str += w_sep;
+                    tmp_str = "failed-hl";
+                    invalid_str += "<span class='"+tmp_str+"'>"+data[1][i].toUpperCase()+"</span>"+w_sep;
                 }
                 else{
-                    valid_str += "<span class='success-hl'>"+data[1][i].toUpperCase()+"</span>";
-                    temp_strg.push(valid_str);
-                    valid_str += w_sep;
+                    tmp_str = "success-hl";
+                    valid_str += "<span class='"+tmp_str+"'>"+data[1][i].toUpperCase()+"</span>"+w_sep;
                 }
-            }
 
+                if(tmp_dup[data[1][i]] == undefined){
+                    tmp_dup[data[1][i]] = 1;
+                    temp_strg.push("<span class='"+tmp_str+"'>"+data[1][i].toUpperCase()+"</span>"); 
+                }
+                
+            }
+            
             if(valid_str != "" && invalid_str == ""){
                 room_data['result_msg'] = room_data[player_turn]['name'] + " move accepted with <span class='success-hl'>+"+room_data[player_turn]['temp_sco']+"</span> points<br/><br/>"+"Valid word(s):<br/>" + valid_str;
                 room_data['word_count'] = data[0].length;
