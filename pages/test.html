@@ -88,19 +88,10 @@
 
 	<script src="/socket.io/socket.io.js"></script>
     <script src="../assets/dist/js/jquery-3.6.3.js"></script>
+    <script src="../assets/js/scripts.js"></script>
 	<script>
-		let socket = io();
-        const url = window.location.href;
-        const player_name = sessionStorage.getItem("user");
-        
-        let action = "";
-        let room_id = "";
-        let player_id = "";
-        let in_game = false;
+		
         let index_name = {'id':'ROOM ID', 'stamp':'TIMESTAMP', 'pid':'Player ID', 'name':'Name', 'status':'Status', 'data':'Player Data'}
-        let errors = {
-            'room-error-1':"Invalid room id!", 'room-error-2':"Room is full!"
-        }
 
         let room_index;
         let player_index;

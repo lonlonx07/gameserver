@@ -404,22 +404,68 @@
 
 			let posx = 0;
 			let posy = 0;
+            let board_w = 480;
+            let board_h = 480;
+            let cell_size = (board_w/10);
 			for(let j=100; j>0; j--){
 					$("#g_"+j).css('background-image', 'url("../images/snakes-and-ladders/board.png")');
-					$("#g_"+j).css('background-size', '450px 450px');
+					$("#g_"+j).css('background-size', board_w+"px "+board_h+"px");
 					$("#g_"+j).css('background-repeat', 'no-repeat');
 
 					
 					$("#g_"+j).css('background-position-x', posx-1);
 					$("#g_"+j).css('background-position-y', posy-1);
-					if(450 == Math.abs(posx)+45){
-						posy -= 45;
+					if(board_w == Math.abs(posx)+cell_size){
+						posy -= cell_size;
 						posx = 0;
 					}
 					else{
-						posx -= 45;
+						posx -= cell_size;
 					}
 			}
+
+            $("#game_board div").css('width', cell_size+"px");
+            $("#game_board div").css('height', cell_size+"px");
+            $("#game_board").css('width', board_w+"px");
+            $("#game_board").css('height', board_w+"px");
+            $(".board-piece").css('objectFit', "fit");
+            
+            /*
+            board_size = [450,450];
+            cell_size = [45,45]
+
+			for(let g=1; g<=100; g++){
+				str = "<div class='board-cell' id='g_"+g+"'></div>"+str;
+			}
+			
+            $("#game_board").html(str);
+
+			let posx = 0;
+			let posy = 0;
+			for(let j=100; j>0; j--){
+					$("#g_"+j).css('background-image', 'url("../images/snakes-and-ladders/board.png")');
+					$("#g_"+j).css('background-size', cell_size[0]+"px"+cell_size[1]+"px");
+					$("#g_"+j).css('background-repeat', 'no-repeat');
+
+					
+					$("#g_"+j).css('background-position-x', posx-1);
+					$("#g_"+j).css('background-position-y', posy-1);
+					if(board_size[0] == Math.abs(posx)+cell_size[0]){
+						posy -= cell_size[0];
+						posx = 0;
+					}
+					else{
+						posx -= cell_size[0];
+					}
+			}
+
+            $(".board-piece").css('width', cell_size[0]+"px");
+            $(".board-piece").css('height', cell_size[1]+"px");
+            $("#game_board div").css('width', cell_size[0]+"px");
+            $("#game_board div").css('height', cell_size[1]+"px");
+            //$(".board-cell").attr('style', "width:"+cell_size[0]+"px; height:"+cell_size[1]+"px;");
+            $("#game_board").attr('style', "width:"+board_size[0]+"px; height:"+board_size[1]+"px;");
+            */
 			
 		}
 

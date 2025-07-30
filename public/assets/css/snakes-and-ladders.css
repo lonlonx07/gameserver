@@ -100,8 +100,8 @@
 		#game_board {
 			display: grid;
 			grid-template-columns: auto auto auto auto auto auto auto auto auto auto;
-			width: 450px;
-			height: 450px;
+			/*width: 550px;
+			height: 550px;*/
 			margin: auto;
 			
 		}
@@ -111,13 +111,13 @@
 			/*border: 1px solid black;*/
 			font-size: 30px;
 			text-align: center;
-			width: 45px;
-			height: 45px;
+			/*width: 55px;
+			height: 55px;*/
 		}
 
 		.board-piece {
-			width: 45px;
-			height: 45px;
+			width: 48px;
+			height: 48px;
 		}
 
 		.board-piece-active {
