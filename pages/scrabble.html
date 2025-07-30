@@ -1166,9 +1166,11 @@
                         $("#cell_"+i).html("");
                     }
                 }
-
-                if(player_turn != ind_arr[1])
-                    set_board_position(dimen['blk'][data['temp'][data['temp'].length-1]]);
+                
+                if(player_turn != parseInt(ind_arr[1]))
+                    try {
+                        set_board_position(dimen['blk'][data['temp'][data['temp'].length-1]]);
+                    }catch(e){}
 
                 show_message(data['result_msg']);
             }
@@ -1286,7 +1288,7 @@
                 }
 
                 if(data['status'] == "begin"){
-                    if(player_turn != ind_arr[1]){
+                    if(player_turn != parseInt(ind_arr[1])){
                         $("#btn_controls").css("visibility", "hidden")
                         $("#turn_controls").css("visibility", "hidden")
                     }
